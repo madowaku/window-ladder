@@ -1,0 +1,42 @@
+{
+  "id": "1_05",
+  "name_key": "stage.1_05.name",
+  "chapter": 1,
+  "order": 5,
+  "size": {
+    "width": 8,
+    "height": 6
+  },
+  "player": {
+    "x": 2,
+    "y": 5
+  },
+  "tiles": [
+    "........",
+    "........",
+    "..C..D..",
+    "........",
+    "........",
+    "GGGGGGGG"
+  ],
+  "ladders": [
+    {
+      "id": "ladder_01",
+      "x": 3,
+      "bottom_y": 5,
+      "length": 4
+    }
+  ],
+  "cats": [
+    {
+      "id": "cat_01",
+      "x": 2,
+      "y": 2,
+      "look_dir": "right"
+    }
+  ],
+  "clear_condition": {
+    "type": "clean_all_dirty_windows"
+  }
+}
+

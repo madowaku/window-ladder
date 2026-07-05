@@ -1,0 +1,55 @@
+{
+  "ui.status": {
+    "ja": "{stage}  手数: {moves}  残りの窓: {dirty}",
+    "en": "{stage}  Moves: {moves}  Dirty windows: {dirty}"
+  },
+  "ui.controls": {
+    "ja": "←/→/↑/↓: 移動  Shift+←/→: ハシゴ  Space: そうじ  Z: もどす  R: やりなおし",
+    "en": "Arrows/WASD: Move  Shift+Left/Right: Ladder  Space: Clean  Z: Undo  R: Reset"
+  },
+  "ui.undo": {
+    "ja": "もどす",
+    "en": "Undo"
+  },
+  "ui.reset": {
+    "ja": "やりなおし",
+    "en": "Reset"
+  },
+  "ui.language": {
+    "ja": "English",
+    "en": "日本語"
+  },
+  "ui.stage_clear": {
+    "ja": "きれいになった！",
+    "en": "All clean!"
+  },
+  "ui.next_stage": {
+    "ja": "次のステージ",
+    "en": "Next stage"
+  },
+  "ui.all_done": {
+    "ja": "全ステージ完了",
+    "en": "All stages done"
+  },
+  "stage.1_01.name": {
+    "ja": "最初の窓",
+    "en": "First Window"
+  },
+  "stage.1_02.name": {
+    "ja": "少し右へ",
+    "en": "A Little Right"
+  },
+  "stage.1_03.name": {
+    "ja": "ふたつの窓",
+    "en": "Two Windows"
+  },
+  "stage.1_04.name": {
+    "ja": "足場へ",
+    "en": "Step Off"
+  },
+  "stage.1_05.name": {
+    "ja": "猫の見る窓",
+    "en": "Cat's Window"
+  }
+}
+

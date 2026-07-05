@@ -1,0 +1,35 @@
+{
+  "id": "1_04",
+  "name_key": "stage.1_04.name",
+  "chapter": 1,
+  "order": 4,
+  "size": {
+    "width": 8,
+    "height": 6
+  },
+  "player": {
+    "x": 2,
+    "y": 5
+  },
+  "tiles": [
+    "........",
+    "........",
+    "....LD..",
+    "........",
+    "........",
+    "GGGGGGGG"
+  ],
+  "ladders": [
+    {
+      "id": "ladder_01",
+      "x": 3,
+      "bottom_y": 5,
+      "length": 4
+    }
+  ],
+  "cats": [],
+  "clear_condition": {
+    "type": "clean_all_dirty_windows"
+  }
+}
+

@@ -1,0 +1,8 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# The playable Godot project lives in /godot for this repository.
+/project.godot
+/icon.svg
+/icon.svg.import
