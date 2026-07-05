@@ -32,3 +32,15 @@ Still later:
 - Cat AI.
 - Production asset generation.
 - Phaser stage editor.
+
+## v0.3: Cat Gaze Hints
+
+Static cats now act as visual hints. Their gaze can point toward dirty windows, enterable windows, ladder positions, or exit clues.
+
+No cat AI or movement yet.
+
+## v0.4 Candidates
+
+- Sleeping Cat: 猫が窓を塞ぐ
+- Bell / Food Bowl: 猫を動かす最小ギミック
+- Open / Shut Windows: 開いた窓は入口、閉じた窓は足場

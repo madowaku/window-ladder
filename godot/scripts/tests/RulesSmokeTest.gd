@@ -33,8 +33,14 @@ func _ready() -> void:
 	_solve_stage_2_01(controller)
 	_solve_stage_2_02(controller)
 	_solve_stage_2_03(controller)
+	_solve_stage_3_01(controller)
+	_solve_stage_3_02(controller)
+	_solve_stage_3_03(controller)
+	_solve_stage_3_04(controller)
+	_solve_stage_3_05(controller)
 	_test_room_undo_and_reset(controller)
 	_test_room_invalid_interactions(controller)
+	_test_cat_gaze_data_and_rules(controller)
 
 	if failures.is_empty():
 		print("RulesSmokeTest OK")
@@ -150,6 +156,73 @@ func _solve_stage_2_03(controller) -> void:
 	_assert(controller.state.is_cleared, "stage 2-03 clears after ladder setup and room route")
 
 
+func _solve_stage_3_01(controller) -> void:
+	controller.load_stage(8)
+	_assert(controller.state.stage_id == "3_01", "loads stage 3-01")
+	_assert(not controller.state.cats[0].get("hint_target", {}).is_empty(), "3-01 parses cat hint target")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(0, -1))
+	_move(controller, Vector2i(0, -1))
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 3-01 clears")
+
+
+func _solve_stage_3_02(controller) -> void:
+	controller.load_stage(9)
+	_assert(controller.state.stage_id == "3_02", "loads stage 3-02")
+	controller.try_move_ladder(1)
+	_move(controller, Vector2i(1, 0))
+	controller.try_move_ladder(1)
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(0, -1))
+	_move(controller, Vector2i(0, -1))
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 3-02 clears")
+
+
+func _solve_stage_3_03(controller) -> void:
+	controller.load_stage(10)
+	_assert(controller.state.stage_id == "3_03", "loads stage 3-03")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "3-03 enters the hinted window")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 3-03 clears")
+
+
+func _solve_stage_3_04(controller) -> void:
+	controller.load_stage(11)
+	_assert(controller.state.stage_id == "3_04", "loads stage 3-04")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.player == Vector2i(5, 3), "3-04 exits at the hinted landing")
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 3-04 clears")
+
+
+func _solve_stage_3_05(controller) -> void:
+	controller.load_stage(12)
+	_assert(controller.state.stage_id == "3_05", "loads stage 3-05")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.player == Vector2i(6, 5), "3-05 exits near the second cat hint")
+	controller.try_move_ladder(-1)
+	_move(controller, Vector2i(-1, 0))
+	_move(controller, Vector2i(-1, 0))
+	_move(controller, Vector2i(0, -1))
+	_move(controller, Vector2i(0, -1))
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 3-05 clears")
+
+
 func _test_room_undo_and_reset(controller) -> void:
 	controller.load_stage(5)
 	_move(controller, Vector2i(1, 0))
@@ -225,6 +298,28 @@ func _test_room_invalid_interactions(controller) -> void:
 	_assert(controller.state.mode == "outside", "outside mode direct exit call stays outside")
 	_assert(controller.state.player == exit_player, "outside mode direct exit call leaves player unchanged")
 	_assert(controller.state.move_count == exit_moves, "outside mode direct exit call does not increment moves")
+
+
+func _test_cat_gaze_data_and_rules(controller) -> void:
+	controller.load_stage(8)
+	var cat := controller.state.cats[0] as Dictionary
+	var hint := cat.get("hint_target", {}) as Dictionary
+	_assert(Vector2i(int(hint.get("x", -1)), int(hint.get("y", -1))) == Vector2i(4, 2), "cat hint target preserves grid coordinate")
+
+	var start_dirty: int = controller.state.dirty_window_count()
+	controller.try_clean()
+	_assert(controller.state.dirty_window_count() == start_dirty, "hint target does not auto-clean windows")
+
+	controller.state.player = Vector2i(1, 2)
+	var start_player: Vector2i = controller.state.player
+	var start_moves: int = controller.state.move_count
+	_move(controller, Vector2i(1, 0))
+	_assert(controller.state.player == start_player, "cat cell remains blocked with hint target")
+	_assert(controller.state.move_count == start_moves, "blocked cat cell with hint target does not increment moves")
+
+	controller.reset_stage()
+	var reset_hint := controller.state.cats[0].get("hint_target", {}) as Dictionary
+	_assert(Vector2i(int(reset_hint.get("x", -1)), int(reset_hint.get("y", -1))) == Vector2i(4, 2), "reset keeps cat hint target")
 
 
 func _test_invalid_player_movement(controller) -> void:

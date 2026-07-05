@@ -8,7 +8,7 @@ const RoomViewScript = preload("res://scripts/gameplay/RoomView.gd")
 
 const CELL_SIZE := 64
 const GRID_ORIGIN := Vector2(56, 104)
-const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03"]
+const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05"]
 const LEVEL_PATH_TEMPLATE := "res://levels/chapter_01/%s.json"
 const STRINGS_PATH := "res://localization/strings.json"
 
@@ -387,7 +387,8 @@ func _draw_tiles() -> void:
 			elif tile == GridTypesRef.TileType.WINDOW_CLEAN:
 				_draw_window(rect, true, false)
 			elif tile == GridTypesRef.TileType.CAT_WINDOW:
-				_draw_window(rect, true, true)
+				_draw_window(rect, true, false)
+				_draw_cat_face(rect, "right")
 			elif tile == GridTypesRef.TileType.ENTERABLE_WINDOW:
 				_draw_window(rect, true, false)
 				_draw_enterable_window_marker(rect)
@@ -410,9 +411,7 @@ func _draw_window(rect: Rect2, clean: bool, is_cat_window: bool) -> void:
 		draw_circle(glass_rect.position + Vector2(13, 14), 6.0, Color("#6f716f"))
 		draw_circle(glass_rect.position + Vector2(30, 28), 8.0, Color("#71745f"))
 	if is_cat_window:
-		draw_circle(glass_rect.get_center() + Vector2(0, 6), 14.0, Color("#2d2730"))
-		draw_circle(glass_rect.get_center() + Vector2(-5, 3), 2.0, Color("#f8e777"))
-		draw_circle(glass_rect.get_center() + Vector2(5, 3), 2.0, Color("#f8e777"))
+		_draw_cat_face(rect, "right")
 
 
 func _draw_enterable_window_marker(rect: Rect2) -> void:
@@ -444,12 +443,67 @@ func _draw_cats() -> void:
 	for cat in state.cats:
 		var cat_position = Vector2i(int(cat.get("x", 0)), int(cat.get("y", 0)))
 		var rect = Rect2(grid_to_world(cat_position), Vector2(CELL_SIZE, CELL_SIZE))
-		_draw_window(rect, true, true)
-		var look_dir = str(cat.get("look_dir", "right"))
-		var center = rect.get_center() + Vector2(0, 4)
-		var eye_offset = Vector2(4 if look_dir == "right" else -4, 0)
-		draw_circle(center + Vector2(-5, -1) + eye_offset, 2.0, Color("#f8e777"))
-		draw_circle(center + Vector2(5, -1) + eye_offset, 2.0, Color("#f8e777"))
+		var look_dir := str(cat.get("look_dir", "right"))
+		_draw_cat_hint(cat, cat_position)
+		_draw_window(rect, true, false)
+		_draw_cat_face(rect, look_dir)
+
+
+func _draw_cat_face(rect: Rect2, look_dir: String) -> void:
+	var glass_rect = rect.grow(-17)
+	var center = glass_rect.get_center() + Vector2(0, 6)
+	var eye_offset := _cat_eye_offset(look_dir)
+	draw_circle(center, 14.0, Color("#2d2730"))
+	draw_circle(center + Vector2(-5, -1) + eye_offset, 2.3, Color("#f8e777"))
+	draw_circle(center + Vector2(5, -1) + eye_offset, 2.3, Color("#f8e777"))
+	draw_circle(center + Vector2(0, 5) + eye_offset * 0.35, 1.6, Color("#f1a4b9"))
+
+
+func _cat_eye_offset(look_dir: String) -> Vector2:
+	if look_dir == "left":
+		return Vector2(-4, 0)
+	if look_dir == "up":
+		return Vector2(0, -4)
+	if look_dir == "down":
+		return Vector2(0, 4)
+	return Vector2(4, 0)
+
+
+func _draw_cat_hint(cat: Dictionary, cat_position: Vector2i) -> void:
+	if not cat.has("hint_target") or typeof(cat.get("hint_target")) != TYPE_DICTIONARY:
+		return
+	var target_data: Dictionary = cat.get("hint_target")
+	var target := Vector2i(int(target_data.get("x", cat_position.x)), int(target_data.get("y", cat_position.y)))
+	if not state.in_bounds(target):
+		return
+
+	var from := grid_to_world(cat_position) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
+	var to := grid_to_world(target) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
+	var direction := to - from
+	if direction.length() <= 1.0:
+		return
+	var unit := direction.normalized()
+	from += unit * 19.0
+	to -= unit * 15.0
+	_draw_dotted_line(from, to, Color(0.98, 0.88, 0.33, 0.42), 3.0, 9.0, 7.0)
+
+	var target_rect := Rect2(grid_to_world(target), Vector2(CELL_SIZE, CELL_SIZE))
+	var target_center := target_rect.get_center()
+	draw_circle(target_center, 14.0, Color(0.98, 0.88, 0.33, 0.16))
+	draw_circle(target_center, 5.0, Color(0.98, 0.88, 0.33, 0.45))
+
+
+func _draw_dotted_line(from: Vector2, to: Vector2, color: Color, width: float, dash: float, gap: float) -> void:
+	var direction := to - from
+	var length := direction.length()
+	if length <= 0.0:
+		return
+	var unit := direction / length
+	var cursor := 0.0
+	while cursor < length:
+		var segment_end = minf(cursor + dash, length)
+		draw_line(from + unit * cursor, from + unit * segment_end, color, width)
+		cursor += dash + gap
 
 
 func _draw_ladders() -> void:

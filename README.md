@@ -25,6 +25,12 @@ v0.1.0 is complete as an outside-wall prototype. It includes five playable JSON 
 
 Not included in v0.1: interior mode, extendable ladders, opening/closing windows, cat AI, production asset generation, or the stage editor.
 
+## v0.3 Status
+
+v0.3 adds static cat gaze hints. Cats do not move yet, but their eyes and subtle gaze markers help point toward interesting windows, ladder positions, or routes.
+
+v0.3では、猫の視線ヒントを追加しました。猫はまだ動きませんが、視線や控えめなハイライトで、気にするべき窓やハシゴ位置を示します。
+
 ## Prototype Controls
 
 - Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.

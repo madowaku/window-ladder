@@ -66,5 +66,25 @@
   "stage.2_03.name": {
     "ja": "入る位置",
     "en": "Make an Entrance"
+  },
+  "stage.3_01.name": {
+    "ja": "視線の先",
+    "en": "Where It Looks"
+  },
+  "stage.3_02.name": {
+    "ja": "下を見る猫",
+    "en": "Looking Down"
+  },
+  "stage.3_03.name": {
+    "ja": "入り口を見る猫",
+    "en": "Cat at the Entrance"
+  },
+  "stage.3_04.name": {
+    "ja": "出口の予感",
+    "en": "Exit Hint"
+  },
+  "stage.3_05.name": {
+    "ja": "猫の視線リレー",
+    "en": "Gaze Relay"
   }
 }

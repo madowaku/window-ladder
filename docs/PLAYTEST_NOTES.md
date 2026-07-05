@@ -18,3 +18,10 @@
 - Replayed `2-01`, `2-02`, and `2-03` after visual polish.
 - Gold outside-window markers, green indoor exit arrows, and blue outside landing markers made the room route easier to read without extra mechanics.
 - No stage layout changes were needed in this pass.
+
+## v0.3 Cat Gaze Hints
+
+- Added `3-01` through `3-05` as static cat-gaze stages.
+- Godot MCP startup check: `res://scenes/Main.tscn` starts without reported errors.
+- `RulesSmokeTest OK` covers loading, intended clears for `3-01` through `3-05`, Undo/Reset, blocked cat cells, and `hint_target` staying visual-only.
+- Visual manual follow-up: judge whether the gaze line is too strong, too weak, readable without text, and whether `3-05` stays compact enough.
