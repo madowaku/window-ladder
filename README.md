@@ -30,4 +30,6 @@ Not included in v0.1: interior mode, extendable ladders, opening/closing windows
 - Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.
 - Push the ladder one tile left or right with Shift + Left/Right while standing beside its bottom.
 - Clean an adjacent dirty window with Space or Enter.
+- Enter a highlighted outside window with Space or Enter, then walk on indoor floor tiles with the same movement keys.
+- Stand on an indoor exit window and press Space or Enter to return to the linked outside wall coordinate.
 - Undo the last move with Z, or reset the current stage with R.

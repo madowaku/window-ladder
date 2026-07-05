@@ -32,7 +32,11 @@ func load_level(path: String):
 	state.tiles = _parse_tiles(data.get("tiles", []), state.width, state.height)
 	state.ladders = _clone_dictionary_array(data.get("ladders", []))
 	state.cats = _clone_dictionary_array(data.get("cats", []))
-	state.is_cleared = state.dirty_window_count() == 0
+	state.enterable_windows = _clone_dictionary_array(data.get("enterable_windows", []))
+	state.rooms = _parse_rooms(data.get("rooms", []))
+	var clear_condition: Dictionary = data.get("clear_condition", {})
+	state.clear_condition_type = str(clear_condition.get("type", "clean_all_dirty_windows"))
+	state.is_cleared = state.clear_condition_type == "clean_all_dirty_windows" and state.dirty_window_count() == 0
 	return state
 
 
@@ -58,3 +62,13 @@ func _clone_dictionary_array(source: Array) -> Array:
 		if typeof(item) == TYPE_DICTIONARY:
 			copy.append((item as Dictionary).duplicate(true))
 	return copy
+
+
+func _parse_rooms(source: Array) -> Dictionary:
+	var rooms := {}
+	for room_data in source:
+		if typeof(room_data) != TYPE_DICTIONARY:
+			continue
+		var room: Dictionary = (room_data as Dictionary).duplicate(true)
+		rooms[str(room.get("id", ""))] = room
+	return rooms

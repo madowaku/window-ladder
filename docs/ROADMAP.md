@@ -11,11 +11,24 @@ Outside-wall prototype complete:
 
 ## v0.2: Window Interior
 
-Next: let the player enter the tower through an outside window, solve a small interior grid puzzle, and exit through another window back to the outside wall.
+Current minimum implementation: let the player enter the tower through an outside window, walk on a small interior grid, and exit through another window back to a linked outside-wall coordinate.
 
-Initial scope:
+Implemented first:
 
-- Add an interior stage view linked to selected outside windows.
-- Map outside window coordinates to interior entry and exit points.
-- Keep the same grid-based movement and undo/reset expectations.
-- Preserve v0.1 outside-wall rules while the interior mode is introduced.
+- `rooms` data in stage JSON.
+- `enterable_window` outside tile support.
+- Linked outside windows via `linked_room_id` and `linked_entry_id`.
+- Room mode in `GameState`.
+- Indoor floor movement and exit-window return.
+- Undo/Reset across outside and room modes.
+- Three v0.2 prototype stages: `2-01`, `2-02`, and `2-03`.
+
+Still later:
+
+- Box pushing.
+- Interior switches.
+- Extendable ladders.
+- Opening and closing windows.
+- Cat AI.
+- Production asset generation.
+- Phaser stage editor.

@@ -13,6 +13,13 @@ var tiles: Array = []
 var player: Vector2i = Vector2i.ZERO
 var ladders: Array = []
 var cats: Array = []
+var enterable_windows: Array = []
+var rooms: Dictionary = {}
+var clear_condition_type: String = "clean_all_dirty_windows"
+var mode: String = "outside"
+var current_room_id: String = ""
+var room_player: Vector2i = Vector2i.ZERO
+var has_entered_room: bool = false
 var move_count: int = 0
 var is_cleared: bool = false
 
@@ -29,6 +36,13 @@ func clone():
 	copy.player = player
 	copy.ladders = _clone_dictionary_array(ladders)
 	copy.cats = _clone_dictionary_array(cats)
+	copy.enterable_windows = _clone_dictionary_array(enterable_windows)
+	copy.rooms = _clone_rooms()
+	copy.clear_condition_type = clear_condition_type
+	copy.mode = mode
+	copy.current_room_id = current_room_id
+	copy.room_player = room_player
+	copy.has_entered_room = has_entered_room
 	copy.move_count = move_count
 	copy.is_cleared = is_cleared
 	return copy
@@ -63,6 +77,75 @@ func dirty_window_count() -> int:
 			if int(tiles[y][x]) == GridTypesRef.TileType.WINDOW_DIRTY:
 				count += 1
 	return count
+
+
+func active_position() -> Vector2i:
+	if mode == "room":
+		return room_player
+	return player
+
+
+func active_room() -> Dictionary:
+	if mode != "room":
+		return {}
+	return rooms.get(current_room_id, {})
+
+
+func room_in_bounds(room: Dictionary, position: Vector2i) -> bool:
+	var size: Dictionary = room.get("size", {})
+	var room_width := int(size.get("width", 0))
+	var room_height := int(size.get("height", 0))
+	return position.x >= 0 and position.y >= 0 and position.x < room_width and position.y < room_height
+
+
+func get_room_tile(room: Dictionary, position: Vector2i) -> String:
+	if not room_in_bounds(room, position):
+		return "#"
+	var rows: Array = room.get("tiles", [])
+	if position.y >= rows.size():
+		return "#"
+	var row := str(rows[position.y])
+	if position.x >= row.length():
+		return "#"
+	return row.substr(position.x, 1)
+
+
+func is_room_walkable(position: Vector2i) -> bool:
+	var room := active_room()
+	if room.is_empty():
+		return false
+	var tile := get_room_tile(room, position)
+	return tile == "F" or tile == "." or tile == "X"
+
+
+func room_exit_at(position: Vector2i) -> Dictionary:
+	var room := active_room()
+	if room.is_empty():
+		return {}
+	for exit in room.get("exits", []):
+		if typeof(exit) != TYPE_DICTIONARY:
+			continue
+		if Vector2i(int(exit.get("x", -1)), int(exit.get("y", -1))) == position:
+			return exit
+	return {}
+
+
+func outside_window_at(position: Vector2i) -> Dictionary:
+	for window in enterable_windows:
+		if Vector2i(int(window.get("x", -1)), int(window.get("y", -1))) == position:
+			return window
+	return {}
+
+
+func room_entry_position(room_id: String, entry_id: String) -> Vector2i:
+	var room: Dictionary = rooms.get(room_id, {})
+	var entries: Array = room.get("entries", [])
+	for entry in entries:
+		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		if str(entry.get("id", "")) == entry_id:
+			return Vector2i(int(entry.get("x", 0)), int(entry.get("y", 0)))
+	return Vector2i.ZERO
 
 
 func ladder_cells(ladder: Dictionary) -> Array:
@@ -104,4 +187,11 @@ func _clone_dictionary_array(source: Array) -> Array:
 	var copy := []
 	for item in source:
 		copy.append((item as Dictionary).duplicate(true))
+	return copy
+
+
+func _clone_rooms() -> Dictionary:
+	var copy := {}
+	for key in rooms.keys():
+		copy[key] = (rooms[key] as Dictionary).duplicate(true)
 	return copy

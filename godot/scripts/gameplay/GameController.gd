@@ -4,16 +4,18 @@ const GridTypesRef = preload("res://scripts/core/GridTypes.gd")
 const LevelLoaderScript = preload("res://scripts/core/LevelLoader.gd")
 const LocalizationManagerScript = preload("res://scripts/core/LocalizationManager.gd")
 const UndoManagerScript = preload("res://scripts/core/UndoManager.gd")
+const RoomViewScript = preload("res://scripts/gameplay/RoomView.gd")
 
 const CELL_SIZE := 64
 const GRID_ORIGIN := Vector2(56, 104)
-const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05"]
+const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03"]
 const LEVEL_PATH_TEMPLATE := "res://levels/chapter_01/%s.json"
 const STRINGS_PATH := "res://localization/strings.json"
 
 var level_loader = LevelLoaderScript.new()
 var localization = LocalizationManagerScript.new()
 var undo_manager = UndoManagerScript.new()
+var room_view = RoomViewScript.new()
 var state
 var initial_state
 var current_level_index := 0
@@ -56,7 +58,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif key == KEY_DOWN or key == KEY_S:
 			try_move_player(Vector2i(0, 1))
 		elif key == KEY_SPACE or key == KEY_ENTER or key == KEY_KP_ENTER:
-			try_clean()
+			try_interact()
 		elif key == KEY_Z:
 			undo()
 		elif key == KEY_R:
@@ -80,18 +82,21 @@ func load_stage(index: int) -> void:
 func try_move_player(direction: Vector2i) -> void:
 	if state == null or state.is_cleared:
 		return
-	var next_position: Vector2i = state.player + direction
+	var next_position: Vector2i = state.active_position() + direction
 	if not can_player_stand(next_position):
 		return
 
 	undo_manager.push_state(state)
-	state.player = next_position
+	if state.mode == "room":
+		state.room_player = next_position
+	else:
+		state.player = next_position
 	state.move_count += 1
 	_after_state_changed()
 
 
 func try_move_ladder(direction_x: int) -> void:
-	if state == null or state.is_cleared:
+	if state == null or state.is_cleared or state.mode != "outside":
 		return
 	if state.is_ladder_cell(state.player):
 		return
@@ -109,7 +114,7 @@ func try_move_ladder(direction_x: int) -> void:
 
 
 func try_clean() -> void:
-	if state == null or state.is_cleared:
+	if state == null or state.is_cleared or state.mode != "outside":
 		return
 
 	var target: Vector2i = find_cleanable_window()
@@ -120,6 +125,52 @@ func try_clean() -> void:
 	state.set_tile(target, GridTypesRef.TileType.WINDOW_CLEAN)
 	state.move_count += 1
 	state.is_cleared = state.dirty_window_count() == 0
+	_after_state_changed()
+
+
+func try_interact() -> void:
+	if state == null or state.is_cleared:
+		return
+	if state.mode == "room":
+		try_exit_room()
+		return
+
+	var dirty_target: Vector2i = find_cleanable_window()
+	if dirty_target != Vector2i(-1, -1):
+		try_clean()
+		return
+	try_enter_room()
+
+
+func try_enter_room() -> void:
+	var window: Dictionary = find_enterable_window()
+	if window.is_empty():
+		return
+	var room_id = str(window.get("linked_room_id", ""))
+	var entry_id = str(window.get("linked_entry_id", ""))
+	if not state.rooms.has(room_id):
+		return
+
+	undo_manager.push_state(state)
+	state.mode = "room"
+	state.current_room_id = room_id
+	state.room_player = state.room_entry_position(room_id, entry_id)
+	state.has_entered_room = true
+	state.move_count += 1
+	_update_hud()
+	queue_redraw()
+
+
+func try_exit_room() -> void:
+	var exit: Dictionary = state.room_exit_at(state.room_player)
+	if exit.is_empty():
+		return
+
+	undo_manager.push_state(state)
+	state.mode = "outside"
+	state.current_room_id = ""
+	state.player = Vector2i(int(exit.get("outside_x", state.player.x)), int(exit.get("outside_y", state.player.y)))
+	state.move_count += 1
 	_after_state_changed()
 
 
@@ -147,6 +198,8 @@ func next_stage() -> void:
 
 
 func can_player_stand(grid_position: Vector2i) -> bool:
+	if state != null and state.mode == "room":
+		return state.is_room_walkable(grid_position)
 	if state == null or not state.in_bounds(grid_position):
 		return false
 	if state.is_ladder_cell(grid_position):
@@ -172,6 +225,8 @@ func can_move_ladder(ladder: Dictionary, direction_x: int) -> bool:
 
 
 func find_cleanable_window() -> Vector2i:
+	if state.mode != "outside":
+		return Vector2i(-1, -1)
 	var directions = [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]
 	for direction in directions:
 		var candidate: Vector2i = state.player + direction
@@ -180,8 +235,20 @@ func find_cleanable_window() -> Vector2i:
 	return Vector2i(-1, -1)
 
 
+func find_enterable_window() -> Dictionary:
+	var directions = [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]
+	for direction in directions:
+		var candidate: Vector2i = state.player + direction
+		if state.in_bounds(candidate) and state.get_tile(candidate) == GridTypesRef.TileType.ENTERABLE_WINDOW:
+			return state.outside_window_at(candidate)
+	return {}
+
+
 func _after_state_changed() -> void:
-	state.is_cleared = state.dirty_window_count() == 0
+	if state.clear_condition_type == "return_to_outside":
+		state.is_cleared = state.mode == "outside" and state.has_entered_room
+	else:
+		state.is_cleared = state.dirty_window_count() == 0
 	_update_hud()
 	queue_redraw()
 
@@ -264,7 +331,7 @@ func _update_hud() -> void:
 		"moves": state.move_count,
 		"dirty": state.dirty_window_count(),
 	})
-	hint_label.text = localization.tr_key("ui.controls")
+	hint_label.text = localization.tr_key("ui.room_controls" if state.mode == "room" else "ui.controls")
 	undo_button.text = localization.tr_key("ui.undo")
 	reset_button.text = localization.tr_key("ui.reset")
 	language_button.text = localization.tr_key("ui.language")
@@ -279,6 +346,11 @@ func _update_hud() -> void:
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, get_viewport_rect().size), Color("#dff3ff"))
 	if state == null:
+		return
+
+	if state.mode == "room":
+		room_view.draw_room(self, state, GRID_ORIGIN, CELL_SIZE)
+		_draw_room_player()
 		return
 
 	_draw_building_backdrop()
@@ -315,6 +387,9 @@ func _draw_tiles() -> void:
 				_draw_window(rect, true, false)
 			elif tile == GridTypesRef.TileType.CAT_WINDOW:
 				_draw_window(rect, true, true)
+			elif tile == GridTypesRef.TileType.ENTERABLE_WINDOW:
+				_draw_window(rect, true, false)
+				draw_rect(rect.grow(-24), Color("#ffe07a"), false, 3.0)
 			draw_rect(rect, Color(0.47, 0.33, 0.24, 0.35), false, 1.0)
 
 
@@ -379,6 +454,15 @@ func _draw_player() -> void:
 	draw_circle(center + Vector2(5, -14), 2.0, Color("#fff5dc"))
 	draw_line(center + Vector2(10, 8), center + Vector2(24, -2), Color("#8c5a35"), 4.0)
 	draw_line(center + Vector2(21, -8), center + Vector2(29, 4), Color("#f2f6fa"), 5.0)
+
+
+func _draw_room_player() -> void:
+	var rect = Rect2(grid_to_world(state.room_player), Vector2(CELL_SIZE, CELL_SIZE))
+	var center = rect.get_center()
+	draw_circle(center + Vector2(0, -8), 12.0, Color("#355c9b"))
+	draw_rect(Rect2(center + Vector2(-13, 3), Vector2(26, 24)), Color("#457bd6"), true)
+	draw_circle(center + Vector2(-4, -10), 2.0, Color("#fff5dc"))
+	draw_circle(center + Vector2(5, -10), 2.0, Color("#fff5dc"))
 
 
 func grid_to_world(grid_position: Vector2i) -> Vector2:

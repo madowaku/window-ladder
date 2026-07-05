@@ -7,6 +7,10 @@
     "ja": "←/→/↑/↓: 移動  Shift+←/→: ハシゴ  Space: そうじ  Z: もどす  R: やりなおし",
     "en": "Arrows/WASD: Move  Shift+Left/Right: Ladder  Space: Clean  Z: Undo  R: Reset"
   },
+  "ui.room_controls": {
+    "ja": "←/→/↑/↓: 室内移動  Space: 窓から出る  Z: もどす  R: やりなおし",
+    "en": "Arrows/WASD: Move indoors  Space: Exit window  Z: Undo  R: Reset"
+  },
   "ui.undo": {
     "ja": "もどす",
     "en": "Undo"
@@ -50,6 +54,17 @@
   "stage.1_05.name": {
     "ja": "猫の見る窓",
     "en": "Cat's Window"
+  },
+  "stage.2_01.name": {
+    "ja": "中を通って",
+    "en": "Through the Room"
+  },
+  "stage.2_02.name": {
+    "ja": "届かない窓",
+    "en": "Out of Reach"
+  },
+  "stage.2_03.name": {
+    "ja": "入る位置",
+    "en": "Make an Entrance"
   }
 }
-
