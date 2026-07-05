@@ -471,15 +471,13 @@ func _draw_sleeping_cat_face(rect: Rect2) -> void:
 	var glass_rect = rect.grow(-17)
 	var center = glass_rect.get_center() + Vector2(0, 7)
 	draw_circle(center, 14.0, Color("#2d2730"))
-	draw_line(center + Vector2(-10, -2), center + Vector2(-2, -2), Color("#f8e777"), 2.0)
-	draw_line(center + Vector2(2, -2), center + Vector2(10, -2), Color("#f8e777"), 2.0)
+	draw_arc(center + Vector2(-6, -3), 4.0, 0.1, PI - 0.1, 8, Color("#f8e777"), 2.0)
+	draw_arc(center + Vector2(6, -3), 4.0, 0.1, PI - 0.1, 8, Color("#f8e777"), 2.0)
 	draw_circle(center + Vector2(0, 5), 1.6, Color("#f1a4b9"))
-	var sleep_color := Color(0.95, 0.98, 1.0, 0.78)
-	var z_origin: Vector2 = glass_rect.position + Vector2(glass_rect.size.x - 9, 5)
-	draw_line(z_origin, z_origin + Vector2(8, 0), sleep_color, 2.0)
-	draw_line(z_origin + Vector2(8, 0), z_origin + Vector2(0, 8), sleep_color, 2.0)
-	draw_line(z_origin + Vector2(0, 8), z_origin + Vector2(8, 8), sleep_color, 2.0)
-	draw_circle(center + Vector2(12, -12), 3.0, Color(0.95, 0.98, 1.0, 0.38))
+	var sleep_color := Color(0.95, 0.98, 1.0, 0.72)
+	draw_circle(center + Vector2(10, -12), 2.6, Color(0.95, 0.98, 1.0, 0.38))
+	draw_circle(center + Vector2(15, -18), 3.6, sleep_color)
+	draw_circle(center + Vector2(22, -25), 5.0, Color(0.95, 0.98, 1.0, 0.5))
 
 
 func _cat_eye_offset(look_dir: String) -> Vector2:

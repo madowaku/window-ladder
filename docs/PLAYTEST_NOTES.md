@@ -42,3 +42,11 @@
 - Sleeping cats are static only; no cat movement, bell, food bowl, or cat AI was added.
 - Manual visual check: reviewed `4-01` through `4-04` via Godot preview captures. The closed eyes and small sleep mark read as sleeping, and `4-04` keeps the open route separate from the blocked window.
 - `RulesSmokeTest OK` covers loading, intended clears, entry block, exit block, watching-cat non-blocking entry/exit behavior, Undo/Reset, and default `watching` state.
+
+## v0.4.1 Sleeping Cat Polish
+
+- Reviewed `4-01` through `4-04` with fresh Godot preview captures and the existing walkthrough routes.
+- Replaced the letter-like sleep mark with small bubbles and curved closed eyes so sleeping reads more visually and less as text.
+- `4-03` still communicates the blocked exit: the sleeping cat sits on the outside landing while the alternate blue marker remains nearby.
+- `4-04` keeps the watching cat gaze, sleeping blocker, open window, and ladder visually separated.
+- `RulesSmokeTest OK`.
