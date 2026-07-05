@@ -12,3 +12,9 @@
 - Added `2-01`, `2-02`, and `2-03` as minimum room-transition stages.
 - Manually cleared `1-01` through `2-03` in the Godot DEBUG window.
 - Verified room entry, indoor movement, room exit, post-exit outside actions, Undo, and Reset.
+
+## v0.2.1 Polish
+
+- Replayed `2-01`, `2-02`, and `2-03` after visual polish.
+- Gold outside-window markers, green indoor exit arrows, and blue outside landing markers made the room route easier to read without extra mechanics.
+- No stage layout changes were needed in this pass.

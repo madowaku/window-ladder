@@ -26,6 +26,15 @@ func draw_room(canvas: CanvasItem, state, origin: Vector2, cell_size: int) -> vo
 				canvas.draw_rect(rect, Color("#badcf4"), true)
 				canvas.draw_rect(rect.grow(-12), Color("#7b5540"), true)
 				canvas.draw_rect(rect.grow(-18), Color("#b9ecff"), true)
+				_draw_exit_marker(canvas, rect)
 			else:
 				canvas.draw_rect(rect, Color("#d8c7a3"), true)
 			canvas.draw_rect(rect, Color(0.1, 0.15, 0.18, 0.35), false, 1.0)
+
+
+func _draw_exit_marker(canvas: CanvasItem, rect: Rect2) -> void:
+	var center = rect.get_center()
+	canvas.draw_rect(rect.grow(-7), Color("#6fd083"), false, 4.0)
+	canvas.draw_line(center + Vector2(-12, 0), center + Vector2(12, 0), Color("#276a3a"), 4.0)
+	canvas.draw_line(center + Vector2(12, 0), center + Vector2(4, -8), Color("#276a3a"), 4.0)
+	canvas.draw_line(center + Vector2(12, 0), center + Vector2(4, 8), Color("#276a3a"), 4.0)

@@ -355,6 +355,7 @@ func _draw() -> void:
 
 	_draw_building_backdrop()
 	_draw_tiles()
+	_draw_exit_landing_markers()
 	_draw_cats()
 	_draw_ladders()
 	_draw_player()
@@ -389,7 +390,7 @@ func _draw_tiles() -> void:
 				_draw_window(rect, true, true)
 			elif tile == GridTypesRef.TileType.ENTERABLE_WINDOW:
 				_draw_window(rect, true, false)
-				draw_rect(rect.grow(-24), Color("#ffe07a"), false, 3.0)
+				_draw_enterable_window_marker(rect)
 			draw_rect(rect, Color(0.47, 0.33, 0.24, 0.35), false, 1.0)
 
 
@@ -412,6 +413,31 @@ func _draw_window(rect: Rect2, clean: bool, is_cat_window: bool) -> void:
 		draw_circle(glass_rect.get_center() + Vector2(0, 6), 14.0, Color("#2d2730"))
 		draw_circle(glass_rect.get_center() + Vector2(-5, 3), 2.0, Color("#f8e777"))
 		draw_circle(glass_rect.get_center() + Vector2(5, 3), 2.0, Color("#f8e777"))
+
+
+func _draw_enterable_window_marker(rect: Rect2) -> void:
+	var center := rect.get_center()
+	draw_rect(rect.grow(-8), Color("#f6c84f"), false, 4.0)
+	draw_circle(center + Vector2(0, 18), 9.0, Color("#f6c84f"))
+	draw_line(center + Vector2(0, 11), center + Vector2(0, -9), Color("#f6c84f"), 4.0)
+	draw_line(center + Vector2(0, -9), center + Vector2(-8, -1), Color("#f6c84f"), 4.0)
+	draw_line(center + Vector2(0, -9), center + Vector2(8, -1), Color("#f6c84f"), 4.0)
+
+
+func _draw_exit_landing_markers() -> void:
+	for room in state.rooms.values():
+		for exit in room.get("exits", []):
+			if typeof(exit) != TYPE_DICTIONARY:
+				continue
+			var landing := Vector2i(int(exit.get("outside_x", -1)), int(exit.get("outside_y", -1)))
+			if not state.in_bounds(landing):
+				continue
+			var rect := Rect2(grid_to_world(landing), Vector2(CELL_SIZE, CELL_SIZE))
+			var center := rect.get_center()
+			draw_circle(center, 13.0, Color(0.26, 0.69, 0.86, 0.9))
+			draw_circle(center, 7.0, Color("#dff3ff"))
+			draw_line(center + Vector2(-11, 0), center + Vector2(11, 0), Color("#2d7f9b"), 3.0)
+			draw_line(center + Vector2(0, -11), center + Vector2(0, 11), Color("#2d7f9b"), 3.0)
 
 
 func _draw_cats() -> void:
