@@ -25,3 +25,12 @@
 - Godot MCP startup check: `res://scenes/Main.tscn` starts without reported errors.
 - `RulesSmokeTest OK` covers loading, intended clears for `3-01` through `3-05`, Undo/Reset, blocked cat cells, and `hint_target` staying visual-only.
 - Visual manual follow-up: judge whether the gaze line is too strong, too weak, readable without text, and whether `3-05` stays compact enough.
+
+## v0.3.1 Cat Gaze Polish
+
+- Reviewed `3-01` through `3-05` in Godot using visual preview captures and the existing clear walkthroughs.
+- Tuned the gaze line and target glint slightly softer so the hint reads as attention rather than an answer marker.
+- Nudged cat eyes a little farther toward `look_dir`; `3-01` still reads clearly as the introductory gaze stage.
+- Kept `3-05` layout unchanged: the two cat hints are separated enough that the relay is readable without adding new rules.
+- Godot MCP startup check: `res://scenes/Main.tscn` starts without reported errors.
+- `RulesSmokeTest OK`.

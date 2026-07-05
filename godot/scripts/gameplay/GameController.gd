@@ -461,12 +461,12 @@ func _draw_cat_face(rect: Rect2, look_dir: String) -> void:
 
 func _cat_eye_offset(look_dir: String) -> Vector2:
 	if look_dir == "left":
-		return Vector2(-4, 0)
+		return Vector2(-5, 0)
 	if look_dir == "up":
-		return Vector2(0, -4)
+		return Vector2(0, -5)
 	if look_dir == "down":
-		return Vector2(0, 4)
-	return Vector2(4, 0)
+		return Vector2(0, 5)
+	return Vector2(5, 0)
 
 
 func _draw_cat_hint(cat: Dictionary, cat_position: Vector2i) -> void:
@@ -485,12 +485,12 @@ func _draw_cat_hint(cat: Dictionary, cat_position: Vector2i) -> void:
 	var unit := direction.normalized()
 	from += unit * 19.0
 	to -= unit * 15.0
-	_draw_dotted_line(from, to, Color(0.98, 0.88, 0.33, 0.42), 3.0, 9.0, 7.0)
+	_draw_dotted_line(from, to, Color(0.98, 0.88, 0.33, 0.34), 2.5, 7.0, 8.0)
 
 	var target_rect := Rect2(grid_to_world(target), Vector2(CELL_SIZE, CELL_SIZE))
 	var target_center := target_rect.get_center()
-	draw_circle(target_center, 14.0, Color(0.98, 0.88, 0.33, 0.16))
-	draw_circle(target_center, 5.0, Color(0.98, 0.88, 0.33, 0.45))
+	draw_circle(target_center, 13.0, Color(0.98, 0.88, 0.33, 0.11))
+	draw_circle(target_center, 4.0, Color(0.98, 0.88, 0.33, 0.34))
 
 
 func _draw_dotted_line(from: Vector2, to: Vector2, color: Color, width: float, dash: float, gap: float) -> void:
