@@ -86,5 +86,21 @@
   "stage.3_05.name": {
     "ja": "猫の視線リレー",
     "en": "Gaze Relay"
+  },
+  "stage.4_01.name": {
+    "ja": "眠る猫",
+    "en": "Sleeping Cat"
+  },
+  "stage.4_02.name": {
+    "ja": "別の窓から",
+    "en": "Another Window"
+  },
+  "stage.4_03.name": {
+    "ja": "ふさがれた出口",
+    "en": "Blocked Exit"
+  },
+  "stage.4_04.name": {
+    "ja": "視線と寝息",
+    "en": "Gaze and Sleep"
   }
 }

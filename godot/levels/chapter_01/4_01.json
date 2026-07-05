@@ -1,0 +1,80 @@
+{
+  "id": "4_01",
+  "name_key": "stage.4_01.name",
+  "chapter": 4,
+  "order": 1,
+  "size": {
+    "width": 8,
+    "height": 6
+  },
+  "player": {
+    "x": 2,
+    "y": 5
+  },
+  "tiles": [
+    "........",
+    "........",
+    ".....D..",
+    "........",
+    "...E....",
+    "GGGGGGGG"
+  ],
+  "ladders": [
+    {
+      "id": "ladder_01",
+      "x": 5,
+      "bottom_y": 5,
+      "length": 3
+    }
+  ],
+  "cats": [
+    {
+      "id": "cat_01",
+      "x": 3,
+      "y": 4,
+      "state": "sleeping"
+    }
+  ],
+  "enterable_windows": [
+    {
+      "id": "blocked_window_01",
+      "x": 3,
+      "y": 4,
+      "linked_room_id": "room_01",
+      "linked_entry_id": "entry_01"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room_01",
+      "size": {
+        "width": 4,
+        "height": 3
+      },
+      "tiles": [
+        "####",
+        "#FX#",
+        "####"
+      ],
+      "entries": [
+        {
+          "id": "entry_01",
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "exits": [
+        {
+          "id": "exit_01",
+          "x": 2,
+          "y": 1,
+          "outside_x": 5,
+          "outside_y": 3
+        }
+      ]
+    }
+  ],
+  "clear_condition": {
+    "type": "clean_all_dirty_windows"
+  }
+}

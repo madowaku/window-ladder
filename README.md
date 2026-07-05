@@ -31,6 +31,12 @@ v0.3 adds static cat gaze hints. Cats do not move yet, but their eyes and subtle
 
 v0.3では、猫の視線ヒントを追加しました。猫はまだ動きませんが、視線や控えめなハイライトで、気にするべき窓やハシゴ位置を示します。
 
+## v0.4 Status
+
+v0.4 adds sleeping cats as static blockers. Sleeping cats do not move, but they can block outside wall cells, enterable windows, and room exits.
+
+v0.4では、眠っている猫を静的な障害物として追加しました。猫はまだ動きませんが、外壁セル、入れる窓、室内からの出口を塞ぎます。
+
 ## Prototype Controls
 
 - Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.

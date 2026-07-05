@@ -34,3 +34,11 @@
 - Kept `3-05` layout unchanged: the two cat hints are separated enough that the relay is readable without adding new rules.
 - Godot MCP startup check: `res://scenes/Main.tscn` starts without reported errors.
 - `RulesSmokeTest OK`.
+
+## v0.4 Sleeping Cat
+
+- Added `4-01` through `4-04` as minimum sleeping-cat blocker stages.
+- Sleeping cats block entering their outside window and block room exits that would land on their outside cell.
+- Sleeping cats are static only; no cat movement, bell, food bowl, or cat AI was added.
+- Manual visual check: reviewed `4-01` through `4-04` via Godot preview captures. The closed eyes and small sleep mark read as sleeping, and `4-04` keeps the open route separate from the blocked window.
+- `RulesSmokeTest OK` covers loading, intended clears, entry block, exit block, watching-cat non-blocking entry/exit behavior, Undo/Reset, and default `watching` state.

@@ -8,7 +8,7 @@ const RoomViewScript = preload("res://scripts/gameplay/RoomView.gd")
 
 const CELL_SIZE := 64
 const GRID_ORIGIN := Vector2(56, 104)
-const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05"]
+const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05", "4_01", "4_02", "4_03", "4_04"]
 const LEVEL_PATH_TEMPLATE := "res://levels/chapter_01/%s.json"
 const STRINGS_PATH := "res://localization/strings.json"
 
@@ -165,11 +165,14 @@ func try_exit_room() -> void:
 	var exit: Dictionary = state.room_exit_at(state.room_player)
 	if exit.is_empty():
 		return
+	var outside_position := Vector2i(int(exit.get("outside_x", state.player.x)), int(exit.get("outside_y", state.player.y)))
+	if state.has_sleeping_cat_at(outside_position):
+		return
 
 	undo_manager.push_state(state)
 	state.mode = "outside"
 	state.current_room_id = ""
-	state.player = Vector2i(int(exit.get("outside_x", state.player.x)), int(exit.get("outside_y", state.player.y)))
+	state.player = outside_position
 	state.move_count += 1
 	_after_state_changed()
 
@@ -239,7 +242,7 @@ func find_enterable_window() -> Dictionary:
 	var directions = [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]
 	for direction in directions:
 		var candidate: Vector2i = state.player + direction
-		if state.in_bounds(candidate) and state.get_tile(candidate) == GridTypesRef.TileType.ENTERABLE_WINDOW:
+		if state.in_bounds(candidate) and state.get_tile(candidate) == GridTypesRef.TileType.ENTERABLE_WINDOW and not state.has_sleeping_cat_at(candidate):
 			return state.outside_window_at(candidate)
 	return {}
 
@@ -444,9 +447,14 @@ func _draw_cats() -> void:
 		var cat_position = Vector2i(int(cat.get("x", 0)), int(cat.get("y", 0)))
 		var rect = Rect2(grid_to_world(cat_position), Vector2(CELL_SIZE, CELL_SIZE))
 		var look_dir := str(cat.get("look_dir", "right"))
-		_draw_cat_hint(cat, cat_position)
+		var cat_state := str(cat.get("state", "watching"))
+		if cat_state != "sleeping":
+			_draw_cat_hint(cat, cat_position)
 		_draw_window(rect, true, false)
-		_draw_cat_face(rect, look_dir)
+		if cat_state == "sleeping":
+			_draw_sleeping_cat_face(rect)
+		else:
+			_draw_cat_face(rect, look_dir)
 
 
 func _draw_cat_face(rect: Rect2, look_dir: String) -> void:
@@ -457,6 +465,21 @@ func _draw_cat_face(rect: Rect2, look_dir: String) -> void:
 	draw_circle(center + Vector2(-5, -1) + eye_offset, 2.3, Color("#f8e777"))
 	draw_circle(center + Vector2(5, -1) + eye_offset, 2.3, Color("#f8e777"))
 	draw_circle(center + Vector2(0, 5) + eye_offset * 0.35, 1.6, Color("#f1a4b9"))
+
+
+func _draw_sleeping_cat_face(rect: Rect2) -> void:
+	var glass_rect = rect.grow(-17)
+	var center = glass_rect.get_center() + Vector2(0, 7)
+	draw_circle(center, 14.0, Color("#2d2730"))
+	draw_line(center + Vector2(-10, -2), center + Vector2(-2, -2), Color("#f8e777"), 2.0)
+	draw_line(center + Vector2(2, -2), center + Vector2(10, -2), Color("#f8e777"), 2.0)
+	draw_circle(center + Vector2(0, 5), 1.6, Color("#f1a4b9"))
+	var sleep_color := Color(0.95, 0.98, 1.0, 0.78)
+	var z_origin: Vector2 = glass_rect.position + Vector2(glass_rect.size.x - 9, 5)
+	draw_line(z_origin, z_origin + Vector2(8, 0), sleep_color, 2.0)
+	draw_line(z_origin + Vector2(8, 0), z_origin + Vector2(0, 8), sleep_color, 2.0)
+	draw_line(z_origin + Vector2(0, 8), z_origin + Vector2(8, 8), sleep_color, 2.0)
+	draw_circle(center + Vector2(12, -12), 3.0, Color(0.95, 0.98, 1.0, 0.38))
 
 
 func _cat_eye_offset(look_dir: String) -> Vector2:

@@ -38,9 +38,14 @@ func _ready() -> void:
 	_solve_stage_3_03(controller)
 	_solve_stage_3_04(controller)
 	_solve_stage_3_05(controller)
+	_solve_stage_4_01(controller)
+	_solve_stage_4_02(controller)
+	_solve_stage_4_03(controller)
+	_solve_stage_4_04(controller)
 	_test_room_undo_and_reset(controller)
 	_test_room_invalid_interactions(controller)
 	_test_cat_gaze_data_and_rules(controller)
+	_test_sleeping_cat_rules(controller)
 
 	if failures.is_empty():
 		print("RulesSmokeTest OK")
@@ -223,6 +228,67 @@ func _solve_stage_3_05(controller) -> void:
 	_assert(controller.state.is_cleared, "stage 3-05 clears")
 
 
+func _solve_stage_4_01(controller) -> void:
+	controller.load_stage(13)
+	_assert(controller.state.stage_id == "4_01", "loads stage 4-01")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "4-01 sleeping cat blocks the nearby window")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(0, -1))
+	_move(controller, Vector2i(0, -1))
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 4-01 clears around the sleeping cat")
+
+
+func _solve_stage_4_02(controller) -> void:
+	controller.load_stage(14)
+	_assert(controller.state.stage_id == "4_02", "loads stage 4-02")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "4-02 sleeping cat blocks the first entrance")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "4-02 enters through the unblocked window")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 4-02 clears through the alternate entrance")
+
+
+func _solve_stage_4_03(controller) -> void:
+	controller.load_stage(15)
+	_assert(controller.state.stage_id == "4_03", "loads stage 4-03")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "4-03 sleeping cat blocks the first exit")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 4-03 clears through the alternate exit")
+
+
+func _solve_stage_4_04(controller) -> void:
+	controller.load_stage(16)
+	_assert(controller.state.stage_id == "4_04", "loads stage 4-04")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "4-04 sleeping cat blocks the decoy entrance")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(-1, 0))
+	_move(controller, Vector2i(0, -1))
+	_move(controller, Vector2i(0, -1))
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 4-04 clears with gaze hint and sleeping block")
+
+
 func _test_room_undo_and_reset(controller) -> void:
 	controller.load_stage(5)
 	_move(controller, Vector2i(1, 0))
@@ -320,6 +386,58 @@ func _test_cat_gaze_data_and_rules(controller) -> void:
 	controller.reset_stage()
 	var reset_hint := controller.state.cats[0].get("hint_target", {}) as Dictionary
 	_assert(Vector2i(int(reset_hint.get("x", -1)), int(reset_hint.get("y", -1))) == Vector2i(4, 2), "reset keeps cat hint target")
+
+
+func _test_sleeping_cat_rules(controller) -> void:
+	controller.load_stage(5)
+	controller.state.cats.append({"id": "sleep_entry", "x": 3, "y": 4, "state": "sleeping"})
+	_move(controller, Vector2i(1, 0))
+	var entry_block_player: Vector2i = controller.state.player
+	var entry_block_moves: int = controller.state.move_count
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "sleeping cat blocks entering its window")
+	_assert(controller.state.player == entry_block_player, "sleeping cat entry block keeps outside player")
+	_assert(controller.state.move_count == entry_block_moves, "sleeping cat entry block does not increment moves")
+
+	controller.state.cats.clear()
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.state.cats.append({"id": "sleep_exit", "x": 5, "y": 5, "state": "sleeping"})
+	var room_player: Vector2i = controller.state.room_player
+	var room_moves: int = controller.state.move_count
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "sleeping cat blocks exiting onto its outside cell")
+	_assert(controller.state.room_player == room_player, "sleeping cat exit block keeps room player")
+	_assert(controller.state.move_count == room_moves, "sleeping cat exit block does not increment moves")
+
+	controller.state.cats.clear()
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "exit works after sleeping cat is removed")
+
+	controller.load_stage(8)
+	var cat := controller.state.cats[0] as Dictionary
+	_assert(str(cat.get("state", "watching")) == "watching", "missing cat state defaults to watching")
+	controller.state.player = Vector2i(1, 2)
+	var blocked_player: Vector2i = controller.state.player
+	_move(controller, Vector2i(1, 0))
+	_assert(controller.state.player == blocked_player, "watching cat still blocks standing on its cell")
+
+	controller.load_stage(5)
+	controller.state.cats.append({"id": "watch_entry", "x": 3, "y": 4, "state": "watching"})
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "watching cat does not block entering its window")
+	_move(controller, Vector2i(1, 0))
+	controller.state.cats.append({"id": "watch_exit", "x": 5, "y": 5, "state": "watching"})
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "watching cat does not block exiting onto its outside cell")
+
+	controller.load_stage(13)
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.reset_stage()
+	_assert(controller.state.stage_id == "4_01", "sleeping cat reset keeps v0.4 stage")
+	_assert(controller.state.mode == "outside", "sleeping cat reset restores outside mode")
 
 
 func _test_invalid_player_movement(controller) -> void:

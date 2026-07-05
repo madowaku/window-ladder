@@ -39,8 +39,14 @@ Static cats now act as visual hints. Their gaze can point toward dirty windows, 
 
 No cat AI or movement yet.
 
-## v0.4 Candidates
+## v0.4: Sleeping Cat
 
-- Sleeping Cat: 猫が窓を塞ぐ
+Sleeping cats now act as static blockers. They can occupy outside wall cells, block enterable windows, and prevent room exits that would land on their outside cell.
+
+No cat AI or movement yet.
+
+## Next Candidates
+
 - Bell / Food Bowl: 猫を動かす最小ギミック
 - Open / Shut Windows: 開いた窓は入口、閉じた窓は足場
+- Box Push: 室内の最小押しギミック

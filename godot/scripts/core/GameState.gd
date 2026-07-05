@@ -70,6 +70,15 @@ func has_cat_at(position: Vector2i) -> bool:
 	return false
 
 
+func has_sleeping_cat_at(position: Vector2i) -> bool:
+	for cat in cats:
+		if str(cat.get("state", "watching")) != "sleeping":
+			continue
+		if Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == position:
+			return true
+	return false
+
+
 func dirty_window_count() -> int:
 	var count := 0
 	for y in range(height):
