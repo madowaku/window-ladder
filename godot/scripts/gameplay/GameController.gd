@@ -197,16 +197,19 @@ func _build_hud() -> void:
 	title_label = Label.new()
 	title_label.position = Vector2(24, 16)
 	title_label.add_theme_font_size_override("font_size", 24)
+	title_label.add_theme_color_override("font_color", Color("#2f4858"))
 	hud_root.add_child(title_label)
 
 	status_label = Label.new()
 	status_label.position = Vector2(24, 48)
 	status_label.add_theme_font_size_override("font_size", 16)
+	status_label.add_theme_color_override("font_color", Color("#395767"))
 	hud_root.add_child(status_label)
 
 	hint_label = Label.new()
 	hint_label.position = Vector2(24, 596)
 	hint_label.add_theme_font_size_override("font_size", 14)
+	hint_label.add_theme_color_override("font_color", Color("#395767"))
 	hud_root.add_child(hint_label)
 
 	undo_button = _make_button(Vector2(580, 18), Vector2(82, 34), _on_undo_button_pressed)

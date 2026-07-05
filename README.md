@@ -18,3 +18,16 @@ Window Ladder / まどふき塔 は、スライド式ハシゴで塔の外壁を
 - Future asset workflow: `agent-sprite-forge`
 
 Open the `godot/` folder in Godot and run the project.
+
+## v0.1 Status
+
+v0.1.0 is complete as an outside-wall prototype. It includes five playable JSON stages, grid movement, ladder climbing and sliding, window cleaning, clear detection, Undo, Reset, and localization-ready UI strings.
+
+Not included in v0.1: interior mode, extendable ladders, opening/closing windows, cat AI, production asset generation, or the stage editor.
+
+## Prototype Controls
+
+- Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.
+- Push the ladder one tile left or right with Shift + Left/Right while standing beside its bottom.
+- Clean an adjacent dirty window with Space or Enter.
+- Undo the last move with Z, or reset the current stage with R.
