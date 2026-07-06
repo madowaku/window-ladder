@@ -1,0 +1,89 @@
+{
+  "id": "5_04",
+  "name_key": "stage.5_04.name",
+  "chapter": 5,
+  "order": 4,
+  "size": {
+    "width": 8,
+    "height": 6
+  },
+  "player": {
+    "x": 2,
+    "y": 5
+  },
+  "tiles": [
+    "........",
+    "........",
+    "........",
+    "........",
+    "...E.D..",
+    "GGGGGGGG"
+  ],
+  "ladders": [],
+  "cats": [
+    {
+      "id": "cat_01",
+      "x": 5,
+      "y": 5,
+      "state": "sleeping"
+    }
+  ],
+  "cat_lures": [
+    {
+      "id": "bell_01",
+      "kind": "bell",
+      "mode": "room",
+      "room_id": "room_01",
+      "x": 1,
+      "y": 1,
+      "target_cat_id": "cat_01",
+      "target_position": {
+        "x": 6,
+        "y": 2
+      },
+      "target_state": "watching"
+    }
+  ],
+  "enterable_windows": [
+    {
+      "id": "entry_window_01",
+      "x": 3,
+      "y": 4,
+      "linked_room_id": "room_01",
+      "linked_entry_id": "entry_01"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room_01",
+      "size": {
+        "width": 5,
+        "height": 3
+      },
+      "tiles": [
+        "#####",
+        "#FFX#",
+        "#####"
+      ],
+      "entries": [
+        {
+          "id": "entry_01",
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "exits": [
+        {
+          "id": "exit_01",
+          "x": 3,
+          "y": 1,
+          "outside_x": 5,
+          "outside_y": 5
+        }
+      ]
+    }
+  ],
+  "clear_condition": {
+    "type": "clean_all_dirty_windows"
+  }
+}

@@ -13,6 +13,7 @@ var tiles: Array = []
 var player: Vector2i = Vector2i.ZERO
 var ladders: Array = []
 var cats: Array = []
+var cat_lures: Array = []
 var enterable_windows: Array = []
 var rooms: Dictionary = {}
 var clear_condition_type: String = "clean_all_dirty_windows"
@@ -36,6 +37,7 @@ func clone():
 	copy.player = player
 	copy.ladders = _clone_dictionary_array(ladders)
 	copy.cats = _clone_dictionary_array(cats)
+	copy.cat_lures = _clone_dictionary_array(cat_lures)
 	copy.enterable_windows = _clone_dictionary_array(enterable_windows)
 	copy.rooms = _clone_rooms()
 	copy.clear_condition_type = clear_condition_type

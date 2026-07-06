@@ -4,12 +4,12 @@
     "en": "{stage}  Moves: {moves}  Dirty windows: {dirty}"
   },
   "ui.controls": {
-    "ja": "←/→/↑/↓: 移動  Shift+←/→: ハシゴ  Space: そうじ  Z: もどす  R: やりなおし",
-    "en": "Arrows/WASD: Move  Shift+Left/Right: Ladder  Space: Clean  Z: Undo  R: Reset"
+    "ja": "←/→/↑/↓: 移動  Shift+←/→: ハシゴ  Space: そうじ/道具/入る  Z: もどす  R: やりなおし",
+    "en": "Arrows/WASD: Move  Shift+Left/Right: Ladder  Space: Clean/Use/Enter  Z: Undo  R: Reset"
   },
   "ui.room_controls": {
-    "ja": "←/→/↑/↓: 室内移動  Space: 窓から出る  Z: もどす  R: やりなおし",
-    "en": "Arrows/WASD: Move indoors  Space: Exit window  Z: Undo  R: Reset"
+    "ja": "←/→/↑/↓: 室内移動  Space: 道具/窓から出る  Z: もどす  R: やりなおし",
+    "en": "Arrows/WASD: Move indoors  Space: Use/Exit window  Z: Undo  R: Reset"
   },
   "ui.undo": {
     "ja": "もどす",
@@ -102,5 +102,25 @@
   "stage.4_04.name": {
     "ja": "視線と寝息",
     "en": "Gaze and Sleep"
+  },
+  "stage.5_01.name": {
+    "ja": "ごはん皿",
+    "en": "Food Bowl"
+  },
+  "stage.5_02.name": {
+    "ja": "部屋のベル",
+    "en": "Room Bell"
+  },
+  "stage.5_03.name": {
+    "ja": "視線とごはん",
+    "en": "Gaze to Bowl"
+  },
+  "stage.5_04.name": {
+    "ja": "ベルを先に",
+    "en": "Ring First"
+  },
+  "stage.5_05.name": {
+    "ja": "猫にお願い",
+    "en": "Ask the Cat"
   }
 }

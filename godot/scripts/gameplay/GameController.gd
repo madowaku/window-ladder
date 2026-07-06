@@ -8,7 +8,7 @@ const RoomViewScript = preload("res://scripts/gameplay/RoomView.gd")
 
 const CELL_SIZE := 64
 const GRID_ORIGIN := Vector2(56, 104)
-const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05", "4_01", "4_02", "4_03", "4_04"]
+const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05", "4_01", "4_02", "4_03", "4_04", "5_01", "5_02", "5_03", "5_04", "5_05"]
 const LEVEL_PATH_TEMPLATE := "res://levels/chapter_01/%s.json"
 const STRINGS_PATH := "res://localization/strings.json"
 
@@ -132,6 +132,8 @@ func try_interact() -> void:
 	if state == null or state.is_cleared:
 		return
 	if state.mode == "room":
+		if try_activate_cat_lure():
+			return
 		try_exit_room()
 		return
 
@@ -139,7 +141,45 @@ func try_interact() -> void:
 	if dirty_target != Vector2i(-1, -1):
 		try_clean()
 		return
+	if try_activate_cat_lure():
+		return
 	try_enter_room()
+
+
+func try_activate_cat_lure() -> bool:
+	var lure: Dictionary = find_activatable_cat_lure()
+	if lure.is_empty():
+		return false
+
+	var target_cat_id := str(lure.get("target_cat_id", ""))
+	var target_cat_index := find_cat_index(target_cat_id)
+	if target_cat_index < 0:
+		return false
+
+	var target_data = lure.get("target_position", {})
+	if typeof(target_data) != TYPE_DICTIONARY:
+		return false
+	var target_position := Vector2i(int(target_data.get("x", -1)), int(target_data.get("y", -1)))
+	if not state.in_bounds(target_position):
+		return false
+
+	var cat: Dictionary = state.cats[target_cat_index]
+	var current_position := Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1)))
+	if current_position == target_position:
+		return false
+	if has_other_cat_at(target_position, target_cat_id):
+		return false
+	if state.mode == "outside" and target_position == state.player:
+		return false
+
+	undo_manager.push_state(state)
+	cat["x"] = target_position.x
+	cat["y"] = target_position.y
+	if lure.has("target_state"):
+		cat["state"] = str(lure.get("target_state", cat.get("state", "watching")))
+	state.move_count += 1
+	_after_state_changed()
+	return true
 
 
 func try_enter_room() -> void:
@@ -245,6 +285,51 @@ func find_enterable_window() -> Dictionary:
 		if state.in_bounds(candidate) and state.get_tile(candidate) == GridTypesRef.TileType.ENTERABLE_WINDOW and not state.has_sleeping_cat_at(candidate):
 			return state.outside_window_at(candidate)
 	return {}
+
+
+func find_activatable_cat_lure() -> Dictionary:
+	if state == null:
+		return {}
+	for lure in state.cat_lures:
+		if typeof(lure) != TYPE_DICTIONARY:
+			continue
+		if not is_cat_lure_active_in_current_mode(lure):
+			continue
+		var lure_position := Vector2i(int(lure.get("x", -1)), int(lure.get("y", -1)))
+		var player_position: Vector2i = state.active_position()
+		var distance: int = abs(player_position.x - lure_position.x) + abs(player_position.y - lure_position.y)
+		if distance <= 1:
+			return lure
+	return {}
+
+
+func is_cat_lure_active_in_current_mode(lure: Dictionary) -> bool:
+	var kind := str(lure.get("kind", ""))
+	if kind != "food_bowl" and kind != "bell":
+		return false
+	var lure_mode := str(lure.get("mode", "outside"))
+	if lure_mode != state.mode:
+		return false
+	if lure_mode == "room" and str(lure.get("room_id", "")) != state.current_room_id:
+		return false
+	return true
+
+
+func find_cat_index(cat_id: String) -> int:
+	for index in range(state.cats.size()):
+		var cat: Dictionary = state.cats[index]
+		if str(cat.get("id", "")) == cat_id:
+			return index
+	return -1
+
+
+func has_other_cat_at(position: Vector2i, target_cat_id: String) -> bool:
+	for cat in state.cats:
+		if str(cat.get("id", "")) == target_cat_id:
+			continue
+		if Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == position:
+			return true
+	return false
 
 
 func _after_state_changed() -> void:
@@ -353,12 +438,14 @@ func _draw() -> void:
 
 	if state.mode == "room":
 		room_view.draw_room(self, state, GRID_ORIGIN, CELL_SIZE)
+		_draw_cat_lures()
 		_draw_room_player()
 		return
 
 	_draw_building_backdrop()
 	_draw_tiles()
 	_draw_exit_landing_markers()
+	_draw_cat_lures()
 	_draw_cats()
 	_draw_ladders()
 	_draw_player()
@@ -440,6 +527,46 @@ func _draw_exit_landing_markers() -> void:
 			draw_circle(center, 7.0, Color("#dff3ff"))
 			draw_line(center + Vector2(-11, 0), center + Vector2(11, 0), Color("#2d7f9b"), 3.0)
 			draw_line(center + Vector2(0, -11), center + Vector2(0, 11), Color("#2d7f9b"), 3.0)
+
+
+func _draw_cat_lures() -> void:
+	for lure in state.cat_lures:
+		if typeof(lure) != TYPE_DICTIONARY:
+			continue
+		if not is_cat_lure_active_in_current_mode(lure):
+			continue
+		var position := Vector2i(int(lure.get("x", -1)), int(lure.get("y", -1)))
+		var rect := Rect2(grid_to_world(position), Vector2(CELL_SIZE, CELL_SIZE))
+		var kind := str(lure.get("kind", ""))
+		if kind == "food_bowl":
+			_draw_food_bowl(rect)
+		elif kind == "bell":
+			_draw_bell(rect)
+
+
+func _draw_food_bowl(rect: Rect2) -> void:
+	var center := rect.get_center() + Vector2(0, 10)
+	draw_circle(center, 17.0, Color("#cfd9e2"))
+	draw_arc(center, 18.0, 0.05, PI - 0.05, 18, Color("#6d7d8f"), 3.0)
+	draw_circle(center + Vector2(-7, -4), 2.5, Color("#b98244"))
+	draw_circle(center + Vector2(1, -6), 2.5, Color("#9f6b3d"))
+	draw_circle(center + Vector2(8, -3), 2.5, Color("#b98244"))
+
+
+func _draw_bell(rect: Rect2) -> void:
+	var center := rect.get_center() + Vector2(0, 3)
+	draw_arc(center + Vector2(-22, -5), 11.0, -0.55, 0.55, 10, Color(0.52, 0.44, 0.22, 0.45), 2.0)
+	draw_arc(center + Vector2(22, -5), 11.0, PI - 0.55, PI + 0.55, 10, Color(0.52, 0.44, 0.22, 0.45), 2.0)
+	draw_circle(center + Vector2(0, -19), 5.0, Color("#f7d45b"))
+	draw_arc(center, 18.0, PI, TAU, 24, Color("#8f6a24"), 3.0)
+	draw_colored_polygon([
+		center + Vector2(-17, 0),
+		center + Vector2(-10, -22),
+		center + Vector2(10, -22),
+		center + Vector2(17, 0)
+	], Color("#f4bf44"))
+	draw_line(center + Vector2(-18, 0), center + Vector2(18, 0), Color("#8f6a24"), 3.0)
+	draw_circle(center + Vector2(0, 3), 4.0, Color("#8f6a24"))
 
 
 func _draw_cats() -> void:

@@ -45,8 +45,13 @@ Sleeping cats now act as static blockers. They can occupy outside wall cells, bl
 
 No cat AI or movement yet.
 
+## v0.5: Bell / Food Bowl
+
+Food bowls and bells can move a specified cat to a specified outside-wall position. This introduces player-triggered cat movement without cat AI, pathfinding, or autonomous behavior.
+
 ## Next Candidates
 
-- Bell / Food Bowl: 猫を動かす最小ギミック
 - Open / Shut Windows: 開いた窓は入口、閉じた窓は足場
 - Box Push: 室内の最小押しギミック
+- Extendable Ladder
+- Cat AI or multi-step cat movement

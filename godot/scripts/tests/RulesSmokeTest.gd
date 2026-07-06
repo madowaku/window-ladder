@@ -42,10 +42,16 @@ func _ready() -> void:
 	_solve_stage_4_02(controller)
 	_solve_stage_4_03(controller)
 	_solve_stage_4_04(controller)
+	_solve_stage_5_01(controller)
+	_solve_stage_5_02(controller)
+	_solve_stage_5_03(controller)
+	_solve_stage_5_04(controller)
+	_solve_stage_5_05(controller)
 	_test_room_undo_and_reset(controller)
 	_test_room_invalid_interactions(controller)
 	_test_cat_gaze_data_and_rules(controller)
 	_test_sleeping_cat_rules(controller)
+	_test_cat_lure_rules(controller)
 
 	if failures.is_empty():
 		print("RulesSmokeTest OK")
@@ -289,6 +295,97 @@ func _solve_stage_4_04(controller) -> void:
 	_assert(controller.state.is_cleared, "stage 4-04 clears with gaze hint and sleeping block")
 
 
+func _solve_stage_5_01(controller) -> void:
+	controller.load_stage(17)
+	_assert(controller.state.stage_id == "5_01", "loads stage 5-01")
+	_assert(controller.state.cat_lures.size() == 1, "5-01 parses food bowl lure")
+	var cat := _cat_by_id(controller, "cat_01")
+	_assert(str(cat.get("state", "")) == "sleeping", "5-01 starts with sleeping cat blocker")
+	controller.try_enter_room()
+	_assert(controller.state.mode == "outside", "5-01 sleeping cat blocks entry before food bowl")
+	controller.try_interact()
+	cat = _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == Vector2i(5, 2), "5-01 food bowl moves cat")
+	_assert(str(cat.get("state", "")) == "watching", "5-01 food bowl updates cat state")
+	controller.undo()
+	cat = _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == Vector2i(3, 4), "5-01 undo restores cat position")
+	_assert(str(cat.get("state", "")) == "sleeping", "5-01 undo restores cat state")
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "5-01 enters after lure clears blocker")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 5-01 clears")
+
+
+func _solve_stage_5_02(controller) -> void:
+	controller.load_stage(18)
+	_assert(controller.state.stage_id == "5_02", "loads stage 5-02")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "5-02 sleeping cat blocks exit before bell")
+	_move(controller, Vector2i(-1, 0))
+	controller.try_interact()
+	var cat := _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == Vector2i(6, 3), "5-02 room bell moves outside cat")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 5-02 clears")
+
+
+func _solve_stage_5_03(controller) -> void:
+	controller.load_stage(19)
+	_assert(controller.state.stage_id == "5_03", "loads stage 5-03")
+	var watcher := _cat_by_id(controller, "cat_guide")
+	var hint := watcher.get("hint_target", {}) as Dictionary
+	_assert(Vector2i(int(hint.get("x", -1)), int(hint.get("y", -1))) == Vector2i(2, 4), "5-03 gaze points to food bowl")
+	controller.try_interact()
+	var sleeper := _cat_by_id(controller, "cat_sleep")
+	_assert(Vector2i(int(sleeper.get("x", -1)), int(sleeper.get("y", -1))) == Vector2i(6, 2), "5-03 food bowl moves sleeping cat")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 5-03 clears")
+
+
+func _solve_stage_5_04(controller) -> void:
+	controller.load_stage(20)
+	_assert(controller.state.stage_id == "5_04", "loads stage 5-04")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "5-04 exit stays blocked before bell")
+	_move(controller, Vector2i(-1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 5-04 clears")
+
+
+func _solve_stage_5_05(controller) -> void:
+	controller.load_stage(21)
+	_assert(controller.state.stage_id == "5_05", "loads stage 5-05")
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 5-05 clears")
+
+
 func _test_room_undo_and_reset(controller) -> void:
 	controller.load_stage(5)
 	_move(controller, Vector2i(1, 0))
@@ -440,6 +537,106 @@ func _test_sleeping_cat_rules(controller) -> void:
 	_assert(controller.state.mode == "outside", "sleeping cat reset restores outside mode")
 
 
+func _test_cat_lure_rules(controller) -> void:
+	controller.load_stage(17)
+	var start_moves: int = controller.state.move_count
+	controller.try_interact()
+	_assert(controller.state.move_count == start_moves + 1, "outside food bowl increments moves when it moves cat")
+	var moved_cat := _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(moved_cat.get("x", -1)), int(moved_cat.get("y", -1))) == Vector2i(5, 2), "outside food bowl moves targeted cat")
+	controller.try_interact()
+	_assert(controller.state.move_count == start_moves + 1, "already satisfied lure does not increment moves")
+	controller.reset_stage()
+	controller.try_interact()
+	controller.reset_stage()
+	moved_cat = _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(moved_cat.get("x", -1)), int(moved_cat.get("y", -1))) == Vector2i(3, 4), "reset restores lured cat")
+	_assert(str(moved_cat.get("state", "")) == "sleeping", "reset restores lured cat state")
+
+	controller.load_stage(18)
+	var outside_moves: int = controller.state.move_count
+	controller.try_interact()
+	var bell_cat := _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(bell_cat.get("x", -1)), int(bell_cat.get("y", -1))) == Vector2i(5, 5), "outside mode does not trigger room bell")
+	_assert(controller.state.move_count == outside_moves, "wrong-mode room bell does not increment moves")
+
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "room lure test reaches blocked exit")
+	var blocked_moves: int = controller.state.move_count
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "blocked exit still has priority after no room lure at exit")
+	_assert(controller.state.move_count == blocked_moves, "blocked exit without lure does not increment moves")
+
+	_move(controller, Vector2i(-1, 0))
+	controller.try_interact()
+	bell_cat = _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(bell_cat.get("x", -1)), int(bell_cat.get("y", -1))) == Vector2i(6, 3), "room bell moves targeted cat")
+	controller.undo()
+	bell_cat = _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(bell_cat.get("x", -1)), int(bell_cat.get("y", -1))) == Vector2i(5, 5), "undo restores room bell cat position")
+
+	controller.load_stage(17)
+	controller.state.cat_lures.append({
+		"id": "invalid_target_position",
+		"kind": "bell",
+		"mode": "outside",
+		"x": 2,
+		"y": 5,
+		"target_cat_id": "cat_01",
+		"target_position": {"x": -1, "y": 0}
+	})
+	controller.state.cat_lures.remove_at(0)
+	var invalid_moves: int = controller.state.move_count
+	controller.try_interact()
+	var invalid_cat := _cat_by_id(controller, "cat_01")
+	_assert(Vector2i(int(invalid_cat.get("x", -1)), int(invalid_cat.get("y", -1))) == Vector2i(3, 4), "invalid lure target leaves cat position unchanged")
+	_assert(controller.state.move_count == invalid_moves, "invalid lure target does not increment moves")
+
+	controller.state.cat_lures.clear()
+	controller.state.cat_lures.append({
+		"id": "missing_cat",
+		"kind": "food_bowl",
+		"mode": "outside",
+		"x": 2,
+		"y": 5,
+		"target_cat_id": "missing",
+		"target_position": {"x": 5, "y": 2}
+	})
+	controller.try_interact()
+	_assert(controller.state.move_count == invalid_moves, "missing target cat does not increment moves")
+
+	controller.state.cat_lures.clear()
+	controller.state.cat_lures.append({
+		"id": "occupied_target",
+		"kind": "food_bowl",
+		"mode": "outside",
+		"x": 2,
+		"y": 5,
+		"target_cat_id": "cat_01",
+		"target_position": {"x": 4, "y": 4}
+	})
+	controller.state.cats.append({"id": "other_cat", "x": 4, "y": 4, "state": "watching"})
+	controller.try_interact()
+	_assert(controller.state.move_count == invalid_moves, "occupied target does not increment moves")
+
+	controller.state.cat_lures.clear()
+	controller.state.cat_lures.append({
+		"id": "player_target",
+		"kind": "food_bowl",
+		"mode": "outside",
+		"x": 2,
+		"y": 5,
+		"target_cat_id": "cat_01",
+		"target_position": {"x": 2, "y": 5}
+	})
+	controller.try_interact()
+	_assert(controller.state.move_count == invalid_moves, "player-occupied target does not increment moves")
+
+
 func _test_invalid_player_movement(controller) -> void:
 	controller.load_stage(0)
 	var start_player: Vector2i = controller.state.player
@@ -521,6 +718,13 @@ func _test_clear_locks_actions(controller) -> void:
 
 func _move(controller, direction: Vector2i) -> void:
 	controller.try_move_player(direction)
+
+
+func _cat_by_id(controller, cat_id: String) -> Dictionary:
+	for cat in controller.state.cats:
+		if str(cat.get("id", "")) == cat_id:
+			return cat
+	return {}
 
 
 func _assert(condition: bool, message: String) -> void:

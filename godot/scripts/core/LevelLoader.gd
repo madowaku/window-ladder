@@ -32,6 +32,7 @@ func load_level(path: String):
 	state.tiles = _parse_tiles(data.get("tiles", []), state.width, state.height)
 	state.ladders = _clone_dictionary_array(data.get("ladders", []))
 	state.cats = _clone_dictionary_array(data.get("cats", []))
+	state.cat_lures = _clone_dictionary_array(data.get("cat_lures", []))
 	state.enterable_windows = _clone_dictionary_array(data.get("enterable_windows", []))
 	state.rooms = _parse_rooms(data.get("rooms", []))
 	var clear_condition: Dictionary = data.get("clear_condition", {})

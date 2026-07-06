@@ -1,0 +1,100 @@
+{
+  "id": "5_03",
+  "name_key": "stage.5_03.name",
+  "chapter": 5,
+  "order": 3,
+  "size": {
+    "width": 8,
+    "height": 6
+  },
+  "player": {
+    "x": 2,
+    "y": 5
+  },
+  "tiles": [
+    "........",
+    "........",
+    "........",
+    "........",
+    "C..E.D..",
+    "GGGGGGGG"
+  ],
+  "ladders": [],
+  "cats": [
+    {
+      "id": "cat_guide",
+      "x": 0,
+      "y": 4,
+      "state": "watching",
+      "look_dir": "right",
+      "hint_target": {
+        "x": 2,
+        "y": 4
+      },
+      "hint_kind": "food_bowl"
+    },
+    {
+      "id": "cat_sleep",
+      "x": 3,
+      "y": 4,
+      "state": "sleeping"
+    }
+  ],
+  "cat_lures": [
+    {
+      "id": "food_bowl_01",
+      "kind": "food_bowl",
+      "mode": "outside",
+      "x": 2,
+      "y": 4,
+      "target_cat_id": "cat_sleep",
+      "target_position": {
+        "x": 6,
+        "y": 2
+      },
+      "target_state": "watching"
+    }
+  ],
+  "enterable_windows": [
+    {
+      "id": "entry_window_01",
+      "x": 3,
+      "y": 4,
+      "linked_room_id": "room_01",
+      "linked_entry_id": "entry_01"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room_01",
+      "size": {
+        "width": 4,
+        "height": 3
+      },
+      "tiles": [
+        "####",
+        "#FX#",
+        "####"
+      ],
+      "entries": [
+        {
+          "id": "entry_01",
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "exits": [
+        {
+          "id": "exit_01",
+          "x": 2,
+          "y": 1,
+          "outside_x": 5,
+          "outside_y": 5
+        }
+      ]
+    }
+  ],
+  "clear_condition": {
+    "type": "clean_all_dirty_windows"
+  }
+}

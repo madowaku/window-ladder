@@ -50,3 +50,14 @@
 - `4-03` still communicates the blocked exit: the sleeping cat sits on the outside landing while the alternate blue marker remains nearby.
 - `4-04` keeps the watching cat gaze, sleeping blocker, open window, and ladder visually separated.
 - `RulesSmokeTest OK`.
+
+## v0.5 Bell / Food Bowl Cat Lures
+
+- Added `5-01` through `5-05` as compact lure stages for food bowls, room bells, gaze-to-lure hints, and a combined review.
+- Food bowls and bells move one specified cat to one specified outside-wall coordinate; no cat AI, autonomous movement, pathfinding, box push, switches, or window open/shut rules were added.
+- Automated coverage targets loading, JSON parsing, food bowl and bell activation, `target_state`, sleeping-cat blocks before activation, Undo/Reset, mode filtering, invalid targets, and existing `1-01` through `4-04` routes.
+- Manual Godot window review: checked `5-01` through `5-05` in the DEBUG window.
+- Food bowls and bells are distinguishable without text: bowls read as pale dishes with small food bits, while bells read as yellow bells with motion marks.
+- Lure activation visibly moves the target cat; for room bells, the effect is confirmed by the previously blocked exit becoming usable and the cat appearing at the new outside-wall window after exit.
+- `5-03` and `5-05` were nudged so the watching cat has a longer dotted gaze line toward the food bowl; `5-05` still reads as a compact review rather than an overloaded stage.
+- `5-04` communicates "ring first": trying the exit first stays in the room, while returning to the visible bell clears the outside sleeping-cat block.

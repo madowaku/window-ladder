@@ -37,11 +37,18 @@ v0.4 adds sleeping cats as static blockers. Sleeping cats do not move, but they 
 
 v0.4では、眠っている猫を静的な障害物として追加しました。猫はまだ動きませんが、外壁セル、入れる窓、室内からの出口を塞ぎます。
 
+## v0.5 Status
+
+v0.5 adds simple cat lures. Food bowls and bells can move a specified cat to a specified place. There is still no cat AI or pathfinding.
+
+v0.5では、猫を動かすためのごはん皿とベルを追加しました。指定された猫を指定地点へ動かすだけで、猫AIや経路探索はまだありません。
+
 ## Prototype Controls
 
 - Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.
 - Push the ladder one tile left or right with Shift + Left/Right while standing beside its bottom.
 - Clean an adjacent dirty window with Space or Enter.
+- Use an adjacent or same-cell food bowl or bell with Space or Enter.
 - Enter a gold-highlighted outside window with Space or Enter, then walk on indoor floor tiles with the same movement keys.
 - Stand on a green-arrow indoor exit window and press Space or Enter to return to the linked blue landing marker outside.
 - Undo the last move with Z, or reset the current stage with R.
