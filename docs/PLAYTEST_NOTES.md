@@ -69,3 +69,15 @@
 - Tweaked the temporary food bowl drawing from a round plate-like mark into a flatter bowl silhouette with a darker rim and visible food bits, making it less face-like beside cats.
 - Raised the cat-gaze dotted line and target glint opacity slightly; `5-03` and `5-05` now read as "look toward the bowl" without turning the hint into a heavy answer marker.
 - Confirmed the lure effects remain readable: cats visibly move, sleeping-cat blocks open, room exits become usable after bells, and `5-05` still feels compact.
+
+## v0.6 Open / Shut Windows
+
+- Added static `window_state` metadata for enterable windows. Missing state defaults to `open` for existing stages.
+- Added `6-01` through `6-05` as compact reading stages for open windows, shut windows, cat gaze, sleeping blockers, and food bowl lures.
+- Open windows keep the previous room-entry behavior. Shut windows are visible as closed panels and cannot be entered with Space/Enter.
+- No player-controlled window toggling, switches, box pushing, extendable ladders, cat AI, or pathfinding was added.
+- Automated coverage targets loading, open/shut parsing, shut-window entry blocking, open-window entry, Undo/Reset preservation, v0.1-v0.5 route stability, and v0.6 intended clears.
+- Manual Godot window review: replayed `6-01` through `6-05` in the DEBUG window.
+- Open windows read as the familiar gold-marked entry windows; shut windows read as closed blue-gray slatted panels without text.
+- Confirmed shut windows do not enter, open windows do enter, `6-03` points past the shut decoy to the open window, and `6-04`/`6-05` keep the lure-to-open-route relationship readable.
+- `6-05` is a little denser than the earlier v0.6 stages, but it stays linear enough for a summary stage.

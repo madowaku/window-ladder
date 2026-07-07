@@ -49,9 +49,13 @@ No cat AI or movement yet.
 
 Food bowls and bells can move a specified cat to a specified outside-wall position. This introduces player-triggered cat movement without cat AI, pathfinding, or autonomous behavior.
 
+## v0.6: Open / Shut Windows
+
+Open and shut window states are now readable from stage data. Open windows keep the existing room-entry behavior; shut windows are visible as closed windows and cannot be entered. Player-controlled opening and closing is still later.
+
 ## Next Candidates
 
-- Open / Shut Windows: 開いた窓は入口、閉じた窓は足場
 - Box Push: 室内の最小押しギミック
 - Extendable Ladder
+- Player-controlled window opening and closing
 - Cat AI or multi-step cat movement

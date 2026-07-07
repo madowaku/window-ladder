@@ -122,5 +122,25 @@
   "stage.5_05.name": {
     "ja": "猫にお願い",
     "en": "Ask the Cat"
+  },
+  "stage.6_01.name": {
+    "ja": "開いた窓、閉じた窓",
+    "en": "Open and Shut"
+  },
+  "stage.6_02.name": {
+    "ja": "入れる窓",
+    "en": "The Open Way"
+  },
+  "stage.6_03.name": {
+    "ja": "開いた窓を見る猫",
+    "en": "Gaze at the Open Window"
+  },
+  "stage.6_04.name": {
+    "ja": "閉じた窓とごはん皿",
+    "en": "Shut Window and Bowl"
+  },
+  "stage.6_05.name": {
+    "ja": "窓を読む",
+    "en": "Read the Windows"
   }
 }

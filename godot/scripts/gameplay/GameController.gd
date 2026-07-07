@@ -8,7 +8,7 @@ const RoomViewScript = preload("res://scripts/gameplay/RoomView.gd")
 
 const CELL_SIZE := 64
 const GRID_ORIGIN := Vector2(56, 104)
-const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05", "4_01", "4_02", "4_03", "4_04", "5_01", "5_02", "5_03", "5_04", "5_05"]
+const LEVEL_IDS := ["1_01", "1_02", "1_03", "1_04", "1_05", "2_01", "2_02", "2_03", "3_01", "3_02", "3_03", "3_04", "3_05", "4_01", "4_02", "4_03", "4_04", "5_01", "5_02", "5_03", "5_04", "5_05", "6_01", "6_02", "6_03", "6_04", "6_05"]
 const LEVEL_PATH_TEMPLATE := "res://levels/chapter_01/%s.json"
 const STRINGS_PATH := "res://localization/strings.json"
 
@@ -283,7 +283,9 @@ func find_enterable_window() -> Dictionary:
 	for direction in directions:
 		var candidate: Vector2i = state.player + direction
 		if state.in_bounds(candidate) and state.get_tile(candidate) == GridTypesRef.TileType.ENTERABLE_WINDOW and not state.has_sleeping_cat_at(candidate):
-			return state.outside_window_at(candidate)
+			var window: Dictionary = state.outside_window_at(candidate)
+			if is_window_open(window):
+				return window
 	return {}
 
 
@@ -330,6 +332,10 @@ func has_other_cat_at(position: Vector2i, target_cat_id: String) -> bool:
 		if Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == position:
 			return true
 	return false
+
+
+func is_window_open(window: Dictionary) -> bool:
+	return str(window.get("window_state", "open")) != "shut"
 
 
 func _after_state_changed() -> void:
@@ -480,8 +486,11 @@ func _draw_tiles() -> void:
 				_draw_window(rect, true, false)
 				_draw_cat_face(rect, "right")
 			elif tile == GridTypesRef.TileType.ENTERABLE_WINDOW:
-				_draw_window(rect, true, false)
-				_draw_enterable_window_marker(rect)
+				var window: Dictionary = state.outside_window_at(cell)
+				var window_state := str(window.get("window_state", "open"))
+				_draw_window(rect, true, false, window_state)
+				if is_window_open(window):
+					_draw_enterable_window_marker(rect)
 			draw_rect(rect, Color(0.47, 0.33, 0.24, 0.35), false, 1.0)
 
 
@@ -490,18 +499,30 @@ func _draw_wall_cell(rect: Rect2, x: int, y: int) -> void:
 	draw_rect(rect, base, true)
 
 
-func _draw_window(rect: Rect2, clean: bool, is_cat_window: bool) -> void:
+func _draw_window(rect: Rect2, clean: bool, is_cat_window: bool, window_state: String = "open") -> void:
 	var frame_rect = rect.grow(-12)
 	var glass_rect = frame_rect.grow(-5)
 	draw_rect(frame_rect, Color("#7b5540"), true)
 	draw_rect(glass_rect, Color("#a7dff2") if clean else Color("#9aa0a7"), true)
 	draw_line(glass_rect.position + Vector2(glass_rect.size.x * 0.5, 0), glass_rect.position + Vector2(glass_rect.size.x * 0.5, glass_rect.size.y), Color("#ecf8ff"), 2.0)
 	draw_line(glass_rect.position + Vector2(0, glass_rect.size.y * 0.5), glass_rect.position + Vector2(glass_rect.size.x, glass_rect.size.y * 0.5), Color("#ecf8ff"), 2.0)
+	if window_state == "shut":
+		_draw_shut_window_overlay(glass_rect)
 	if not clean:
 		draw_circle(glass_rect.position + Vector2(13, 14), 6.0, Color("#6f716f"))
 		draw_circle(glass_rect.position + Vector2(30, 28), 8.0, Color("#71745f"))
 	if is_cat_window:
 		_draw_cat_face(rect, "right")
+
+
+func _draw_shut_window_overlay(glass_rect: Rect2) -> void:
+	var panel_color := Color("#6f8791")
+	var seam_color := Color("#e8f3f6")
+	draw_rect(glass_rect.grow(-1), panel_color, true)
+	draw_line(glass_rect.position + Vector2(glass_rect.size.x * 0.5, 2), glass_rect.position + Vector2(glass_rect.size.x * 0.5, glass_rect.size.y - 2), Color("#52656d"), 3.0)
+	draw_line(glass_rect.position + Vector2(4, glass_rect.size.y * 0.33), glass_rect.position + Vector2(glass_rect.size.x - 4, glass_rect.size.y * 0.33), seam_color, 2.0)
+	draw_line(glass_rect.position + Vector2(4, glass_rect.size.y * 0.66), glass_rect.position + Vector2(glass_rect.size.x - 4, glass_rect.size.y * 0.66), seam_color, 2.0)
+	draw_circle(glass_rect.position + Vector2(glass_rect.size.x * 0.5 - 4, glass_rect.size.y * 0.5), 2.4, Color("#d6c26a"))
 
 
 func _draw_enterable_window_marker(rect: Rect2) -> void:

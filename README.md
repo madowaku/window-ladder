@@ -43,12 +43,18 @@ v0.5 adds simple cat lures. Food bowls and bells can move a specified cat to a s
 
 v0.5では、猫を動かすためのごはん皿とベルを追加しました。指定された猫を指定地点へ動かすだけで、猫AIや経路探索はまだありません。
 
+## v0.6 Status
+
+v0.6 adds static open and shut window states. Open windows can be entered; shut windows cannot be entered, but they still read as window cells on the outside wall. There is still no player-controlled opening or closing.
+
+v0.6では、開いた窓と閉じた窓の初期状態を追加しました。開いた窓には入れますが、閉じた窓には入れません。プレイヤー操作で窓を開閉する処理はまだありません。
+
 ## Prototype Controls
 
 - Move with arrow keys or WASD. The player can stand on ground, ledges, and ladder cells.
 - Push the ladder one tile left or right with Shift + Left/Right while standing beside its bottom.
 - Clean an adjacent dirty window with Space or Enter.
 - Use an adjacent or same-cell food bowl or bell with Space or Enter.
-- Enter a gold-highlighted outside window with Space or Enter, then walk on indoor floor tiles with the same movement keys.
+- Enter a gold-highlighted open outside window with Space or Enter, then walk on indoor floor tiles with the same movement keys. Shut windows are visible but cannot be entered.
 - Stand on a green-arrow indoor exit window and press Space or Enter to return to the linked blue landing marker outside.
 - Undo the last move with Z, or reset the current stage with R.

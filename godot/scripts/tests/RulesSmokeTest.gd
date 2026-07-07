@@ -47,11 +47,17 @@ func _ready() -> void:
 	_solve_stage_5_03(controller)
 	_solve_stage_5_04(controller)
 	_solve_stage_5_05(controller)
+	_solve_stage_6_01(controller)
+	_solve_stage_6_02(controller)
+	_solve_stage_6_03(controller)
+	_solve_stage_6_04(controller)
+	_solve_stage_6_05(controller)
 	_test_room_undo_and_reset(controller)
 	_test_room_invalid_interactions(controller)
 	_test_cat_gaze_data_and_rules(controller)
 	_test_sleeping_cat_rules(controller)
 	_test_cat_lure_rules(controller)
+	_test_open_shut_window_rules(controller)
 
 	if failures.is_empty():
 		print("RulesSmokeTest OK")
@@ -386,6 +392,94 @@ func _solve_stage_5_05(controller) -> void:
 	_assert(controller.state.is_cleared, "stage 5-05 clears")
 
 
+func _solve_stage_6_01(controller) -> void:
+	controller.load_stage(22)
+	_assert(controller.state.stage_id == "6_01", "loads stage 6-01")
+	_assert(str(controller.state.enterable_windows[0].get("window_state", "open")) == "shut", "6-01 parses shut window")
+	_assert(str(controller.state.enterable_windows[1].get("window_state", "open")) == "open", "6-01 parses open window")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "6-01 shut window does not enter")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "6-01 open window enters")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 6-01 clears")
+
+
+func _solve_stage_6_02(controller) -> void:
+	controller.load_stage(23)
+	_assert(controller.state.stage_id == "6_02", "loads stage 6-02")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "6-02 shut first window blocks entry")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "6-02 alternate open window enters")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 6-02 clears")
+
+
+func _solve_stage_6_03(controller) -> void:
+	controller.load_stage(24)
+	_assert(controller.state.stage_id == "6_03", "loads stage 6-03")
+	var guide := _cat_by_id(controller, "cat_guide")
+	var hint := guide.get("hint_target", {}) as Dictionary
+	_assert(Vector2i(int(hint.get("x", -1)), int(hint.get("y", -1))) == Vector2i(5, 4), "6-03 cat gaze points to open window")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "6-03 shut decoy window does not enter")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "6-03 hinted open window enters")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 6-03 clears")
+
+
+func _solve_stage_6_04(controller) -> void:
+	controller.load_stage(25)
+	_assert(controller.state.stage_id == "6_04", "loads stage 6-04")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "6-04 shut window does not enter")
+	_move(controller, Vector2i(-1, 0))
+	controller.try_interact()
+	var cat := _cat_by_id(controller, "cat_sleep")
+	_assert(Vector2i(int(cat.get("x", -1)), int(cat.get("y", -1))) == Vector2i(6, 2), "6-04 food bowl clears open window cat")
+	_move(controller, Vector2i(1, 0))
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "6-04 open window enters after lure")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 6-04 clears")
+
+
+func _solve_stage_6_05(controller) -> void:
+	controller.load_stage(26)
+	_assert(controller.state.stage_id == "6_05", "loads stage 6-05")
+	controller.try_interact()
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "6-05 shut window remains closed after lure")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "6-05 open window enters after lure")
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	controller.try_clean()
+	_assert(controller.state.is_cleared, "stage 6-05 clears")
+
+
 func _test_room_undo_and_reset(controller) -> void:
 	controller.load_stage(5)
 	_move(controller, Vector2i(1, 0))
@@ -635,6 +729,32 @@ func _test_cat_lure_rules(controller) -> void:
 	})
 	controller.try_interact()
 	_assert(controller.state.move_count == invalid_moves, "player-occupied target does not increment moves")
+
+
+func _test_open_shut_window_rules(controller) -> void:
+	controller.load_stage(22)
+	var start_moves: int = controller.state.move_count
+	_move(controller, Vector2i(1, 0))
+	var at_shut: Vector2i = controller.state.player
+	controller.try_interact()
+	_assert(controller.state.mode == "outside", "shut window interaction stays outside")
+	_assert(controller.state.player == at_shut, "shut window interaction leaves player unchanged")
+	_assert(controller.state.move_count == start_moves + 1, "shut window interaction does not increment moves")
+
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "open window interaction enters room")
+	controller.undo()
+	_assert(controller.state.mode == "outside", "undo after open entry restores outside")
+	_assert(controller.state.player == Vector2i(4, 5), "undo after open entry restores player")
+	controller.reset_stage()
+	_assert(controller.state.mode == "outside", "reset after open entry restores outside mode")
+	_assert(str(controller.state.enterable_windows[0].get("window_state", "open")) == "shut", "reset keeps shut window metadata")
+
+	controller.load_stage(5)
+	_move(controller, Vector2i(1, 0))
+	controller.try_interact()
+	_assert(controller.state.mode == "room", "missing window_state remains open for old stages")
 
 
 func _test_invalid_player_movement(controller) -> void:
