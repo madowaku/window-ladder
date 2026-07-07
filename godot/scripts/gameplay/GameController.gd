@@ -546,11 +546,18 @@ func _draw_cat_lures() -> void:
 
 func _draw_food_bowl(rect: Rect2) -> void:
 	var center := rect.get_center() + Vector2(0, 10)
-	draw_circle(center, 17.0, Color("#cfd9e2"))
-	draw_arc(center, 18.0, 0.05, PI - 0.05, 18, Color("#6d7d8f"), 3.0)
-	draw_circle(center + Vector2(-7, -4), 2.5, Color("#b98244"))
-	draw_circle(center + Vector2(1, -6), 2.5, Color("#9f6b3d"))
-	draw_circle(center + Vector2(8, -3), 2.5, Color("#b98244"))
+	draw_circle(center + Vector2(2, 5), 16.0, Color(0.12, 0.16, 0.18, 0.12))
+	draw_colored_polygon([
+		center + Vector2(-19, -4),
+		center + Vector2(19, -4),
+		center + Vector2(13, 10),
+		center + Vector2(-13, 10)
+	], Color("#d7e0e8"))
+	draw_line(center + Vector2(-18, -4), center + Vector2(18, -4), Color("#607586"), 4.0)
+	draw_line(center + Vector2(-13, 10), center + Vector2(13, 10), Color("#8ea0ad"), 2.0)
+	draw_circle(center + Vector2(-8, -9), 2.7, Color("#b98244"))
+	draw_circle(center + Vector2(0, -11), 2.7, Color("#9f6b3d"))
+	draw_circle(center + Vector2(8, -8), 2.7, Color("#b98244"))
 
 
 func _draw_bell(rect: Rect2) -> void:
@@ -633,12 +640,12 @@ func _draw_cat_hint(cat: Dictionary, cat_position: Vector2i) -> void:
 	var unit := direction.normalized()
 	from += unit * 19.0
 	to -= unit * 15.0
-	_draw_dotted_line(from, to, Color(0.98, 0.88, 0.33, 0.34), 2.5, 7.0, 8.0)
+	_draw_dotted_line(from, to, Color(0.98, 0.88, 0.33, 0.42), 2.7, 7.0, 8.0)
 
 	var target_rect := Rect2(grid_to_world(target), Vector2(CELL_SIZE, CELL_SIZE))
 	var target_center := target_rect.get_center()
-	draw_circle(target_center, 13.0, Color(0.98, 0.88, 0.33, 0.11))
-	draw_circle(target_center, 4.0, Color(0.98, 0.88, 0.33, 0.34))
+	draw_circle(target_center, 13.0, Color(0.98, 0.88, 0.33, 0.13))
+	draw_circle(target_center, 4.0, Color(0.98, 0.88, 0.33, 0.4))
 
 
 func _draw_dotted_line(from: Vector2, to: Vector2, color: Color, width: float, dash: float, gap: float) -> void:

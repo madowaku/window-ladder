@@ -61,3 +61,11 @@
 - Lure activation visibly moves the target cat; for room bells, the effect is confirmed by the previously blocked exit becoming usable and the cat appearing at the new outside-wall window after exit.
 - `5-03` and `5-05` were nudged so the watching cat has a longer dotted gaze line toward the food bowl; `5-05` still reads as a compact review rather than an overloaded stage.
 - `5-04` communicates "ring first": trying the exit first stays in the room, while returning to the visible bell clears the outside sleeping-cat block.
+
+## v0.5.1 Cat Lure Polish
+
+- Replayed `5-01` through `5-05` in the Godot DEBUG window after the v0.5 commit.
+- The bell was already readable as a yellow bell at small size, so its layout and behavior stayed unchanged.
+- Tweaked the temporary food bowl drawing from a round plate-like mark into a flatter bowl silhouette with a darker rim and visible food bits, making it less face-like beside cats.
+- Raised the cat-gaze dotted line and target glint opacity slightly; `5-03` and `5-05` now read as "look toward the bowl" without turning the hint into a heavy answer marker.
+- Confirmed the lure effects remain readable: cats visibly move, sleeping-cat blocks open, room exits become usable after bells, and `5-05` still feels compact.
